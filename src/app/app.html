@@ -1,0 +1,21 @@
+<main style="font-family: sans-serif; padding: 28px; max-width: 720px; margin: 0 auto;">
+  <h1>CampusLab — Portal de Servicios</h1>
+  <hr style="margin-bottom: 20px;" />
+
+  <section *ngIf="!isLoggedIn">
+    <p>Inicia sesión con tu cuenta institucional para acceder al sistema de laboratorios:</p>
+    <button (click)="login()" style="padding: 10px 20px; font-size: 15px; cursor: pointer;">
+      Iniciar sesión con Microsoft
+    </button>
+  </section>
+
+  <section *ngIf="isLoggedIn">
+    <p>Usuario: <strong>{{ userName }}</strong></p>
+    <p>Roles activos: <strong>{{ roles.join(', ') || 'Sin rol asignado' }}</strong></p>
+    <button (click)="logout()" style="padding: 8px 16px; cursor: pointer; margin-top: 10px;">
+      Cerrar sesión
+    </button>
+  </section>
+
+  <router-outlet></router-outlet>
+</main>
