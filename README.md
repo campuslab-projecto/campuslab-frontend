@@ -1,59 +1,112 @@
-# CampuslabFrontend
+# campuslab-frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.8.
+Frontend web del sistema CampusLab, desarrollado con Angular e integrado con Microsoft Azure AD mediante MSAL.
 
-## Development server
+## Descripción
 
-To start a local development server, run:
+CampusLab es una plataforma para la reserva de laboratorios y equipos académicos.  
+Este componente corresponde al frontend de la aplicación, encargado de permitir el inicio de sesión corporativo, proteger rutas según autenticación y consumir endpoints protegidos del backend.
+
+El caso CampusLab exige login corporativo con Azure AD, frontend Angular con MSAL y autorización por rol para Admin, Operador/Técnico y Cliente/Estudiante. 
+
+## Tecnologías utilizadas
+
+- Angular
+- TypeScript
+- MSAL Angular
+- Microsoft Azure AD
+- HTML
+- CSS
+- GitHub
+
+## Funcionalidades implementadas
+
+- Login con Microsoft Azure AD.
+- Cierre de sesión.
+- Protección de rutas con `MsalGuard`.
+- Interceptor HTTP con `MsalInterceptor`.
+- Envío automático de `Bearer Token` hacia el backend.
+- Dashboard para usuario autenticado.
+- Vista de reservas protegida.
+- Consumo del endpoint protegido `/api/bookings`.
+
+## Rutas principales
+
+| Ruta | Acceso | Descripción |
+|---|---|---|
+| `/login` | Público | Inicio de sesión con Microsoft |
+| `/dashboard` | Autenticado | Panel principal del usuario |
+| `/bookings` | Autenticado | Listado y creación de reservas |
+
+## Configuración MSAL
+
+El frontend utiliza MSAL para autenticarse contra Azure AD.
+
+Configuración principal:
+
+```typescript
+clientId: '8902fa8d-4f71-4cd9-9a43-ddd5486e7327'
+authority: 'https://login.microsoftonline.com/902cf874-0ee4-4917-b9cb-6b55af9993be'
+redirectUri: 'http://localhost:4200'
+```
+
+Scope utilizado para consumir el backend:
+
+```typescript
+api://36ccc99d-6294-4333-a064-d62fa6237c7c/access_as_user
+```
+
+## Endpoint del backend
+
+Para ejecución local con BFF en puerto 8080:
+
+```typescript
+http://localhost:8080/api/bookings
+```
+
+El token se adjunta automáticamente mediante `MsalInterceptor`.
+
+## Instalación
+
+```bash
+npm install
+```
+
+## Ejecución local
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Luego abrir:
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```text
+http://localhost:4200
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Evidencia esperada
 
-```bash
-ng generate --help
+- Login Microsoft funcionando.
+- Dashboard mostrando usuario autenticado.
+- Ruta `/bookings` protegida.
+- Llamada a `/api/bookings` con estado 200.
+- Header `Authorization: Bearer <token>` presente en Network.
+- Redirección a login si el usuario no está autenticado.
+
+## Flujo de seguridad
+
+```text
+Usuario → Angular + MSAL → Azure AD → Access Token → BFF protegido
 ```
 
-## Building
+## Gestión del proyecto
 
-To build the project run:
+Este repositorio se gestiona mediante GitHub Projects y metodología Kanban.
 
-```bash
-ng build
+Flujo de trabajo:
+
+```text
+Issue → Rama feature → Commit → Pull Request → Revisión → Merge a main
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+No se trabaja directamente sobre `main`.
