@@ -22,7 +22,11 @@ export const msalConfig: Configuration = {
 
 export const protectedResources = {
   api: {
-    endpoint: 'http://localhost:8080/api/*',
+    endpoint: 'http://localhost:8080/api/',
     scopes: ['api://36ccc99d-6294-4333-a064-d62fa6237c7c/access_as_user']
   }
+};
+
+export const loginRequest = {
+  scopes: protectedResources.api.scopes
 };

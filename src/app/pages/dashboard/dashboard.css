@@ -1,0 +1,10 @@
+.card {
+  padding: 22px;
+  border: 1px solid #d9dee7;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+h2 {
+  margin-top: 0;
+}

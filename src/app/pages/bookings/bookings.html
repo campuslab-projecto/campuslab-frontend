@@ -1,0 +1,74 @@
+<section class="card">
+  <h2>Reservas</h2>
+
+  <p>
+    Esta vista consume <strong>GET /api/bookings</strong> en el BFF.
+    El Bearer Token lo agrega MsalInterceptor automáticamente.
+  </p>
+
+  <h3>Crear reserva de prueba</h3>
+
+  <form (ngSubmit)="createBooking()">
+    <p>
+      <label>
+        Correo estudiante
+        <input
+          type="email"
+          name="userEmail"
+          [(ngModel)]="newBooking.userEmail"
+        />
+      </label>
+    </p>
+
+    <p>
+      <label>
+        Recurso / laboratorio
+        <input
+          type="text"
+          name="resourceId"
+          [(ngModel)]="newBooking.resourceId"
+        />
+      </label>
+    </p>
+
+    <button type="submit">Crear reserva</button>
+  </form>
+
+  <h3>Listado de reservas</h3>
+
+  <button type="button" (click)="loadBookings()">
+    Actualizar
+  </button>
+
+  <p *ngIf="loading && bookings.length === 0">
+    Cargando reservas...
+  </p>
+
+  <p *ngIf="error" style="color: red;">
+    {{ error }}
+  </p>
+
+  <table *ngIf="bookings.length > 0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Estudiante</th>
+        <th>Recurso</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let booking of bookings">
+        <td>{{ booking.id }}</td>
+        <td>{{ booking.userEmail }}</td>
+        <td>{{ booking.resourceId }}</td>
+        <td>{{ booking.status }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!loading && !error && bookings.length === 0">
+    No hay reservas registradas.
+  </p>
+</section>
