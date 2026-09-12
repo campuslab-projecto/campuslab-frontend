@@ -1,11 +1,13 @@
 import { Configuration, BrowserCacheLocation, LogLevel } from '@azure/msal-browser';
 
+const currentOrigin = window.location.origin;
+
 export const msalConfig: Configuration = {
   auth: {
     clientId: '8902fa8d-4f71-4cd9-9a43-ddd5486e7327',
     authority: 'https://login.microsoftonline.com/902cf874-0ee4-4917-b9cb-6b55af9993be',
-    redirectUri: 'http://localhost:4200',
-    postLogoutRedirectUri: 'http://localhost:4200'
+    redirectUri: currentOrigin,
+    postLogoutRedirectUri: currentOrigin
   },
   cache: {
     cacheLocation: BrowserCacheLocation.LocalStorage
