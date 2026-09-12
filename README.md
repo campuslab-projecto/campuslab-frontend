@@ -1,59 +1,49 @@
-# CampuslabFrontend
+# CampusLab Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.8.
+Frontend Angular para CampusLab, plataforma de reserva de laboratorios y equipos académicos.
 
-## Development server
+## Tecnologías
 
-To start a local development server, run:
+- Angular
+- MSAL Angular
+- Azure AD / Microsoft Entra ID
+- HttpClient
 
-```bash
-ng serve
-```
+## Funcionalidades EP1
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Login con Microsoft mediante MSAL.
+- Logout con Microsoft.
+- Rutas protegidas con `MsalGuard`.
+- `MsalInterceptor` configurado para adjuntar `Authorization: Bearer <token>` en llamadas al BFF.
+- Dashboard con lectura de usuario, roles, scopes y audience desde el access token.
+- Vista `/bookings` que consume `GET /api/bookings` desde el BFF.
 
-## Code scaffolding
+## Configuración Azure AD
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Archivo principal: `src/app/auth-config.ts`
 
-```bash
-ng generate component component-name
-```
+Variables configuradas:
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- `clientId`: ID de la app frontend registrada en Azure AD.
+- `authority`: tenant de Azure AD.
+- `redirectUri`: `http://localhost:4200`.
+- `scopes`: scope expuesto por la API/BFF.
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Ejecutar localmente
 
 ```bash
-ng test
+npm install
+npm start
 ```
 
-## Running end-to-end tests
+La aplicación queda disponible en:
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
+```text
+http://localhost:4200
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Rutas
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- `/login`: inicio de sesión.
+- `/dashboard`: vista protegida con información del usuario autenticado.
+- `/bookings`: vista protegida que consume el endpoint de reservas.

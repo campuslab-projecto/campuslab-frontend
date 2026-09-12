@@ -1,0 +1,123 @@
+<section class="card">
+  <div class="page-header">
+    <div>
+      <span class="eyebrow">Gestión académica</span>
+      <h2>Reservas de laboratorios</h2>
+      <p>
+        Crea, revisa y administra solicitudes de reserva para laboratorios y equipos académicos.
+      </p>
+    </div>
+
+      <button class="primary-button" type="button" (click)="loadBookings()">
+      Actualizar reservas
+    </button>
+  </div>
+
+  <div class="info-banner">
+    <div>
+      <strong>Endpoint protegido</strong>
+      <p>
+        Esta vista consume <code>GET /api/bookings</code> en el BFF.
+        El Bearer Token lo adjunta MSAL automáticamente.
+      </p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <section class="form-card">
+      <h3>Nueva reserva</h3>
+
+      <form (ngSubmit)="createBooking()">
+        <label>
+          Correo estudiante
+          <input
+            type="email"
+            name="userEmail"
+            [(ngModel)]="newBooking.userEmail"
+            placeholder="estudiante@duocuc.cl"
+          />
+        </label>
+
+        <label>
+          Recurso / laboratorio
+          <input
+            type="text"
+            name="resourceId"
+            [(ngModel)]="newBooking.resourceId"
+            placeholder="LAB-REDES-01"
+          />
+        </label>
+
+          <button class="primary-button full-button" type="submit">
+                Crear reserva
+      </button>
+      </form>
+    </section>
+
+    <section class="summary-card">
+      <h3>Resumen</h3>
+
+      <div class="metric">
+        <span>Total reservas</span>
+        <strong>{{ bookings.length }}</strong>
+      </div>
+
+      <div class="metric">
+        <span>Estado del servicio</span>
+        <strong *ngIf="!error">Activo</strong>
+        <strong *ngIf="error">Error</strong>
+      </div>
+
+      <div class="metric">
+        <span>Seguridad</span>
+        <strong>JWT</strong>
+      </div>
+    </section>
+  </div>
+
+  <section class="table-section">
+    <div class="table-header">
+      <div>
+        <h3>Listado de reservas</h3>
+        <p>Información recibida desde el microservicio mediante el BFF.</p>
+      </div>
+    </div>
+
+    <p *ngIf="loading && bookings.length === 0" class="loading">
+      Cargando reservas...
+    </p>
+
+    <p *ngIf="error" class="error-message">
+      {{ error }}
+    </p>
+
+    <table *ngIf="bookings.length > 0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Estudiante</th>
+          <th>Recurso</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let booking of bookings">
+          <td>#{{ booking.id }}</td>
+          <td>{{ booking.userEmail }}</td>
+          <td>{{ booking.resourceId }}</td>
+          <td>
+            <span class="status-pill">
+              {{ booking.status }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!loading && !error && bookings.length === 0" class="empty-state">
+      <h3>No hay reservas registradas</h3>
+      <p>Crea una nueva reserva para visualizarla en este panel.</p>
+    </div>
+  </section>
+</section>

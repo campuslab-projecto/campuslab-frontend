@@ -1,0 +1,112 @@
+<section class="dashboard-page">
+  <div class="hero-card">
+    <div>
+      <span class="eyebrow">CampusLab</span>
+      <h2>Panel principal</h2>
+      <p>
+        Vista protegida mediante MSAL y Azure AD. Desde aquí puedes revisar el estado general
+        del sistema de reservas académicas.
+      </p>
+    </div>
+
+    <div class="security-badge">
+      <span>MSAL Guard</span>
+      <strong>Activo</strong>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <article class="stat-card">
+      <span>Usuario</span>
+      <strong>{{ name }}</strong>
+      <p>{{ username }}</p>
+    </article>
+
+    <article class="stat-card">
+      <span>Roles</span>
+      <strong>{{ roles.length || 0 }}</strong>
+      <p>{{ roles.length ? roles.join(', ') : 'Sin roles asignados' }}</p>
+    </article>
+
+    <article class="stat-card">
+      <span>Scopes</span>
+      <strong>{{ scopes.length || 0 }}</strong>
+      <p>{{ scopes.length ? scopes.join(', ') : 'Sin scopes visibles' }}</p>
+    </article>
+
+    <article class="stat-card">
+      <span>Seguridad</span>
+      <strong>JWT</strong>
+      <p>Token validado por el BFF</p>
+    </article>
+  </div>
+
+  <div class="content-grid">
+    <section class="info-card">
+      <h3>Información de sesión</h3>
+
+      <div class="info-row">
+        <span>Nombre</span>
+        <strong>{{ name }}</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Usuario</span>
+        <strong>{{ username }}</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Roles</span>
+        <strong>{{ roles.length ? roles.join(', ') : 'Sin roles asignados' }}</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Scopes</span>
+        <strong>{{ scopes.length ? scopes.join(', ') : 'Sin scopes visibles' }}</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Audience del token</span>
+        <strong>{{ audience || 'No disponible' }}</strong>
+      </div>
+    </section>
+
+    <section class="info-card">
+      <h3>Resumen operacional CampusLab</h3>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <span></span>
+          <div>
+            <strong>Autenticación corporativa</strong>
+            <p>Inicio de sesión mediante Azure AD y MSAL Angular.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <span></span>
+          <div>
+            <strong>Rutas protegidas</strong>
+            <p>Dashboard y reservas protegidas mediante MsalGuard.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <span></span>
+          <div>
+            <strong>Consumo seguro del backend</strong>
+            <p>El frontend envía Bearer Token al BFF usando MsalInterceptor.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <span></span>
+          <div>
+            <strong>Microservicio de reservas</strong>
+            <p>El BFF deriva solicitudes hacia ms-campuslab-bookings.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>

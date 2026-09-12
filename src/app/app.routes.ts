@@ -1,9 +1,24 @@
 import { Routes } from '@angular/router';
 import { MsalGuard } from '@azure/msal-angular';
-import { App } from './app';
 
 export const routes: Routes = [
-  { path: 'dashboard', component: App, canActivate: [MsalGuard] },
-  { path: 'bookings', component: App, canActivate: [MsalGuard] },
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./pages/login/login').then(m => m.Login)
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./pages/dashboard/dashboard').then(m => m.Dashboard),
+    canActivate: [MsalGuard]
+  },
+  {
+    path: 'bookings',
+    loadComponent: () =>
+      import('./pages/bookings/bookings').then(m => m.Bookings),
+    canActivate: [MsalGuard]
+  },
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: '**', redirectTo: 'dashboard' }
 ];
