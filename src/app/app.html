@@ -1,0 +1,22 @@
+<main class="layout">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">CL</div>
+
+      <div>
+        <h1>CampusLab</h1>
+        <p>Reserva de laboratorios y equipos académicos</p>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/bookings" routerLinkActive="active">Reservas</a>
+      <button type="button" (click)="logout()">Cerrar sesión</button>
+    </nav>
+  </header>
+
+  <section class="content">
+    <router-outlet></router-outlet>
+  </section>
+</main>
