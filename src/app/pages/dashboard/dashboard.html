@@ -109,4 +109,56 @@
       </div>
     </section>
   </div>
+
+  <section class="feature-card">
+    <span class="feature-pill">EP3</span>
+    <h3>Integraciones Cloud Native</h3>
+    <p class="feature-description">
+      Arquitectura incorporada para mensajería asíncrona, persistencia cloud y administración de RabbitMQ.
+    </p>
+
+    <div class="integration-grid">
+      <article class="integration-item">
+        <h4>RabbitMQ</h4>
+        <span class="integration-badge success">Integrado</span>
+        <p>Mensajería desacoplada mediante colas, exchanges, bindings y routing keys.</p>
+      </article>
+
+      <article class="integration-item">
+        <h4>ms-notify</h4>
+        <span class="integration-badge success">Consumers</span>
+        <p>Procesamiento asíncrono de notificaciones, tickets de preparación y vouchers.</p>
+      </article>
+
+      <article class="integration-item">
+        <h4>Dead Letter Queues</h4>
+        <span class="integration-badge success">Configuradas</span>
+        <p>Manejo de mensajes que no pueden ser procesados mediante DLQ y confirmación manual.</p>
+      </article>
+
+      <article class="integration-item">
+        <h4>AWS RDS</h4>
+        <span class="integration-badge success">PostgreSQL</span>
+        <p>Persistencia cloud de reservas mediante PostgreSQL, JPA e Hibernate.</p>
+      </article>
+
+      <article class="integration-item">
+        <h4>Rabbit Admin</h4>
+        <span class="integration-badge success">REST API</span>
+        <p>Administración de colas, exchanges y bindings mediante un microservicio independiente.</p>
+      </article>
+    </div>
+
+    <div class="flow-strip">
+      <span>Reserva</span>
+      <span>→</span>
+      <span>ms-bookings</span>
+      <span>→</span>
+      <span>RabbitMQ</span>
+      <span>→</span>
+      <span>ms-notify</span>
+      <span>→</span>
+      <span>Email / Ticket / Voucher</span>
+    </div>
+  </section>
 </section>
