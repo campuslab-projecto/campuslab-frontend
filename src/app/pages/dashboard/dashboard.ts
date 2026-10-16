@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MsalService } from '@azure/msal-angular';
 
@@ -7,45 +7,29 @@ import { MsalService } from '@azure/msal-angular';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css'
+  styleUrls: ['./dashboard.css']
 })
-export class Dashboard implements OnInit {
-  name = 'No disponible';
-  username = 'No disponible';
+export class Dashboard {
+  name = 'Usuario';
+  username = '';
   roles: string[] = [];
   scopes: string[] = [];
-  audience = 'No disponible';
+  audience = '';
 
-  constructor(private msalService: MsalService) {}
-
-  ngOnInit(): void {
+  constructor(private msalService: MsalService) {
     const account =
       this.msalService.instance.getActiveAccount() ??
       this.msalService.instance.getAllAccounts()[0];
 
-    if (!account) {
-      return;
-    }
+    if (account) {
+      this.name = account.name || 'Usuario';
+      this.username = account.username || '';
 
-    this.name = account.name ?? 'No disponible';
-    this.username = account.username ?? 'No disponible';
+      const claims: any = account.idTokenClaims || {};
 
-    const claims: any = account.idTokenClaims ?? {};
-
-    this.roles = Array.isArray(claims.roles) && claims.roles.length > 0
-  ? claims.roles
-  : ['ESTUDIANTE'];
-
-    if (typeof claims.scp === 'string') {
-      this.scopes = claims.scp.split(' ');
-    } else {
-      this.scopes = [];
-    }
-
-    if (Array.isArray(claims.aud)) {
-      this.audience = claims.aud.join(', ');
-    } else {
-      this.audience = claims.aud ?? 'No disponible';
+      this.roles = claims.roles || [];
+      this.scopes = claims.scp ? String(claims.scp).split(' ') : [];
+      this.audience = claims.aud || '';
     }
   }
 }

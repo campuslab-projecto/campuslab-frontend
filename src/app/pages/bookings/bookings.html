@@ -8,7 +8,7 @@
       </p>
     </div>
 
-      <button class="primary-button" type="button" (click)="loadBookings()">
+    <button class="primary-button" type="button" (click)="loadBookings()">
       Actualizar reservas
     </button>
   </div>
@@ -48,9 +48,9 @@
           />
         </label>
 
-          <button class="primary-button full-button" type="submit">
-                Crear reserva
-      </button>
+        <button class="primary-button full-button" type="submit">
+          Crear reserva
+        </button>
       </form>
     </section>
 
@@ -72,8 +72,120 @@
         <span>Seguridad</span>
         <strong>JWT</strong>
       </div>
+
+      <div class="metric">
+        <span>Mensajería</span>
+        <strong>RabbitMQ</strong>
+      </div>
     </section>
   </div>
+
+  <section class="ep3-booking-flow">
+    <div class="ep3-booking-header">
+      <span class="ep3-booking-badge">EP3</span>
+      <h3>Flujo asíncrono de reservas</h3>
+      <p>
+        Cada cambio de estado genera eventos que son publicados por
+        <strong>ms-bookings</strong> y procesados de forma desacoplada por
+        <strong>ms-notify</strong> mediante RabbitMQ.
+      </p>
+    </div>
+
+    <div class="booking-flow-grid">
+      <article class="booking-flow-card">
+        <div class="booking-state requested">
+          SOLICITADA
+        </div>
+
+        <h4>Reserva creada</h4>
+
+        <p>
+          Al crear una reserva se genera el evento:
+        </p>
+
+        <code>BOOKING_CREATED</code>
+
+        <div class="booking-route">
+          <span>ms-bookings</span>
+          <span>→</span>
+          <span>RabbitMQ</span>
+          <span>→</span>
+          <span>q.cmd.email</span>
+          <span>→</span>
+          <span>EmailConsumer</span>
+        </div>
+      </article>
+
+      <article class="booking-flow-card">
+        <div class="booking-state approved">
+          APROBADA
+        </div>
+
+        <h4>Reserva aprobada</h4>
+
+        <p>
+          El cambio de estado genera:
+        </p>
+
+        <code>BOOKING_STATUS_CHANGED</code>
+
+        <div class="booking-route">
+          <span>ms-bookings</span>
+          <span>→</span>
+          <span>RabbitMQ</span>
+          <span>→</span>
+          <span>EmailConsumer</span>
+        </div>
+
+        <div class="booking-route secondary-route">
+          <span>RabbitMQ</span>
+          <span>→</span>
+          <span>q.cmd.prep</span>
+          <span>→</span>
+          <span>PrepConsumer</span>
+        </div>
+      </article>
+
+      <article class="booking-flow-card">
+        <div class="booking-state returned">
+          DEVUELTA
+        </div>
+
+        <h4>Reserva devuelta</h4>
+
+        <p>
+          El cambio de estado genera:
+        </p>
+
+        <code>BOOKING_STATUS_CHANGED</code>
+
+        <div class="booking-route">
+          <span>ms-bookings</span>
+          <span>→</span>
+          <span>RabbitMQ</span>
+          <span>→</span>
+          <span>EmailConsumer</span>
+        </div>
+
+        <div class="booking-route secondary-route">
+          <span>RabbitMQ</span>
+          <span>→</span>
+          <span>q.cmd.voucher</span>
+          <span>→</span>
+          <span>VoucherConsumer</span>
+        </div>
+      </article>
+    </div>
+
+    <div class="dlq-info">
+      <strong>Manejo de errores</strong>
+      <p>
+        Si un mensaje no puede ser procesado correctamente, el consumer envía
+        un <code>NACK</code> sin requeue y RabbitMQ lo deriva a la
+        Dead Letter Queue correspondiente.
+      </p>
+    </div>
+  </section>
 
   <section class="table-section">
     <div class="table-header">
@@ -98,6 +210,7 @@
           <th>Estudiante</th>
           <th>Recurso</th>
           <th>Estado</th>
+          <th>Procesamiento EP3</th>
         </tr>
       </thead>
 
@@ -106,10 +219,39 @@
           <td>#{{ booking.id }}</td>
           <td>{{ booking.userEmail }}</td>
           <td>{{ booking.resourceId }}</td>
+
           <td>
             <span class="status-pill">
               {{ booking.status }}
             </span>
+          </td>
+
+          <td>
+            <div class="async-process" [ngSwitch]="booking.status">
+              <span *ngSwitchCase="'SOLICITADA'">
+                EmailConsumer
+              </span>
+
+              <span *ngSwitchCase="'APROBADA'">
+                EmailConsumer + PrepConsumer
+              </span>
+
+              <span *ngSwitchCase="'DEVUELTA'">
+                EmailConsumer + VoucherConsumer
+              </span>
+
+              <span *ngSwitchCase="'EN_PREPARACION'">
+                PrepConsumer
+              </span>
+
+              <span *ngSwitchCase="'CANCELADA'">
+                EmailConsumer
+              </span>
+
+              <span *ngSwitchDefault>
+                Evento RabbitMQ
+              </span>
+            </div>
           </td>
         </tr>
       </tbody>

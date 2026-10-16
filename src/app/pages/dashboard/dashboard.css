@@ -172,6 +172,107 @@
   line-height: 1.5;
 }
 
+.feature-card {
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+}
+
+.feature-pill {
+  display: inline-flex;
+  margin-bottom: 12px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.feature-card h3 {
+  margin: 0 0 10px;
+  font-size: 32px;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+}
+
+.feature-description {
+  margin: 0 0 20px;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.integration-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.integration-item {
+  padding: 16px;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.integration-item h4 {
+  margin: 0 0 8px;
+  color: #0f172a;
+  font-size: 16px;
+}
+
+.integration-item p {
+  margin: 10px 0 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.integration-badge {
+  display: inline-flex;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.integration-badge.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.flow-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 14px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #eff6ff, #e0f2fe);
+  border: 1px solid #bfdbfe;
+}
+
+.flow-strip span {
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: white;
+  color: #1e3a8a;
+  font-weight: 800;
+  font-size: 13px;
+  border: 1px solid #bfdbfe;
+}
+
+@media (max-width: 1200px) {
+  .integration-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 950px) {
   .hero-card,
   .content-grid {
@@ -182,10 +283,15 @@
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .integration-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 620px) {
-  .stats-grid {
+  .stats-grid,
+  .integration-grid {
     grid-template-columns: 1fr;
   }
 
@@ -193,7 +299,8 @@
     padding: 22px;
   }
 
-  .hero-card h2 {
+  .hero-card h2,
+  .feature-card h3 {
     font-size: 28px;
   }
 
@@ -203,5 +310,10 @@
 
   .info-row strong {
     text-align: left;
+  }
+
+  .flow-strip {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
