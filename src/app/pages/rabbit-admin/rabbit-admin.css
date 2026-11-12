@@ -1,0 +1,257 @@
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.rabbit-page {
+  max-width: 1120px;
+  margin: 24px auto;
+  padding: 0 20px 48px;
+  color: #172238;
+}
+
+.page-header {
+  margin-bottom: 22px;
+}
+
+.eyebrow {
+  display: inline-block;
+  padding: 7px 12px;
+  margin-bottom: 12px;
+  border-radius: 20px;
+  background: #e2edff;
+  color: #175cd3;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.page-header h2 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.page-header p {
+  margin: 0;
+  color: #66758c;
+  line-height: 1.6;
+}
+
+.info-banner {
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  border: 1px solid #bfddfc;
+  border-radius: 14px;
+  background: linear-gradient(110deg, #edf5ff, #eafbfa);
+}
+
+.info-banner strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.info-banner p {
+  margin: 0;
+  color: #40536c;
+  line-height: 1.5;
+}
+
+.rabbit-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.admin-card {
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid #dde6f1;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(30, 55, 90, 0.05);
+}
+
+.card-heading {
+  margin-bottom: 24px;
+}
+
+.section-tag {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #e8f0ff;
+  color: #175cd3;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.card-heading h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.card-heading p {
+  margin: 0;
+  color: #718096;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.admin-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.admin-card label {
+  color: #344359;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-card input:not([type="checkbox"]),
+.admin-card select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 13px;
+  border: 1px solid #d5e0ed;
+  border-radius: 10px;
+  background: #fff;
+  color: #172238;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.admin-card input:focus,
+.admin-card select:focus {
+  border-color: #3485f5;
+  box-shadow: 0 0 0 3px rgba(52, 133, 245, 0.12);
+}
+
+.checkbox-line {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 3px 0 8px;
+  cursor: pointer;
+}
+
+.checkbox-line input {
+  width: 16px;
+  height: 16px;
+  accent-color: #2375ed;
+}
+
+.primary-button,
+.danger-button {
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.primary-button {
+  background: linear-gradient(100deg, #2964ed, #0796cf);
+  color: white;
+}
+
+.danger-button {
+  background: #fee7e7;
+  color: #bc2b32;
+  border: 1px solid #ffc7ca;
+}
+
+.primary-button:hover:not(:disabled),
+.danger-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.primary-button:disabled,
+.danger-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.separator {
+  height: 1px;
+  margin: 25px 0;
+  background: #e5eaf1;
+}
+
+.admin-card h4 {
+  margin: 0 0 15px;
+  font-size: 14px;
+}
+
+.success-message,
+.error-message {
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.success-message {
+  background: #e6f8ed;
+  border: 1px solid #b9e8ca;
+  color: #176b38;
+}
+
+.error-message {
+  background: #fff0f0;
+  border: 1px solid #ffcaca;
+  color: #b42332;
+}
+
+.security-note {
+  margin-top: 22px;
+  padding: 17px 20px;
+  border: 1px solid #dbe5f1;
+  border-radius: 12px;
+  background: #f8fbff;
+  color: #51637b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.security-note strong {
+  color: #25364d;
+}
+
+/* TABLETS */
+@media (max-width: 1000px) {
+  .rabbit-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* TELÉFONOS */
+@media (max-width: 650px) {
+  .rabbit-page {
+    padding: 0 14px 32px;
+  }
+
+  .rabbit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-card {
+    padding: 18px;
+  }
+
+  .page-header h2 {
+    font-size: 23px;
+  }
+}

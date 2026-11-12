@@ -1,5 +1,9 @@
+
 <main class="layout">
+
   <header class="topbar">
+
+    <!-- LOGO Y NOMBRE -->
     <div class="brand">
       <div class="brand-icon">CL</div>
 
@@ -9,14 +13,68 @@
       </div>
     </div>
 
-    <nav class="nav">
-      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-      <a routerLink="/bookings" routerLinkActive="active">Reservas</a>
-      <button type="button" (click)="logout()">Cerrar sesión</button>
+    <!-- MENÚ SEGÚN ROL -->
+    <nav class="nav" *ngIf="initialized && isLoggedIn()">
+
+      <!-- Dashboard para usuarios autenticados -->
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="active">
+        Dashboard
+      </a>
+
+      <!-- ESTUDIANTE -->
+      <a
+        *ngIf="hasRole('ESTUDIANTE')"
+        routerLink="/bookings"
+        routerLinkActive="active">
+        Mis reservas
+      </a>
+
+      <!-- TÉCNICO Y ADMIN -->
+      <a
+        *ngIf="hasAnyRole(['TECNICO', 'ADMIN'])"
+        routerLink="/bookings"
+        routerLinkActive="active">
+        Gestión de reservas
+      </a>
+
+      <!-- ADMINISTRADOR -->
+      <a
+        *ngIf="hasRole('ADMIN')"
+        routerLink="/rabbit-admin"
+        routerLinkActive="active">
+        RabbitMQ Admin
+      </a>
+
+      <!-- AUDITOR -->
+      <a
+        *ngIf="hasAnyRole(['AUDITOR', 'ADMIN'])"
+        routerLink="/audit"
+        routerLinkActive="active">
+        Auditoría
+      </a>
+
+      <!-- USUARIO -->
+      <span
+        *ngIf="userRoles.length > 0"
+        class="user-role">
+        {{ userRoles.join(', ') }}
+      </span>
+
+      <!-- CERRAR SESIÓN -->
+      <button
+        type="button"
+        (click)="logout()">
+        Cerrar sesión
+      </button>
+
     </nav>
+
   </header>
 
   <section class="content">
     <router-outlet></router-outlet>
   </section>
+
 </main>
