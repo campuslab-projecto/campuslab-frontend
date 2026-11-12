@@ -1,5 +1,7 @@
+
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
+
 import {
   provideHttpClient,
   withInterceptorsFromDi,
@@ -26,12 +28,21 @@ import {
 } from '@azure/msal-angular';
 
 import { routes } from './app.routes';
-import { msalConfig, protectedResources, loginRequest } from './auth-config';
 
+import {
+  msalConfig,
+  protectedResources,
+  loginRequest
+} from './auth-config';
+
+
+// Crear la instancia de Microsoft MSAL
 export function MSALInstanceFactory(): IPublicClientApplication {
   return new PublicClientApplication(msalConfig);
 }
 
+
+// Configurar la protección de las rutas Angular
 export function MSALGuardConfigFactory(): MsalGuardConfiguration {
   return {
     interactionType: InteractionType.Redirect,
@@ -40,16 +51,22 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
   };
 }
 
+
+// Configurar el interceptor que agrega el token JWT
 export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
+
   const protectedResourceMap = new Map<string, Array<string>>();
 
+  // Endpoint exacto de reservas
   protectedResourceMap.set(
-    'https://ok83lxm1s3.execute-api.us-east-1.amazonaws.com/api/bookings',
+    `${protectedResources.api.endpoint}bookings`,
     protectedResources.api.scopes
   );
 
+  // Todas las subrutas de CampusLab:
+  // /api/bookings/1/status, /api/rabbit/queues, etc.
   protectedResourceMap.set(
-    'https://ok83lxm1s3.execute-api.us-east-1.amazonaws.com/api/',
+    `${protectedResources.api.endpoint}*`,
     protectedResources.api.scopes
   );
 
@@ -59,8 +76,11 @@ export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
   };
 }
 
+
+// Configuración principal de Angular
 export const appConfig: ApplicationConfig = {
   providers: [
+
     provideRouter(routes),
 
     provideHttpClient(withInterceptorsFromDi()),
@@ -71,14 +91,17 @@ export const appConfig: ApplicationConfig = {
       provide: MSAL_INSTANCE,
       useFactory: MSALInstanceFactory
     },
+
     {
       provide: MSAL_GUARD_CONFIG,
       useFactory: MSALGuardConfigFactory
     },
+
     {
       provide: MSAL_INTERCEPTOR_CONFIG,
       useFactory: MSALInterceptorConfigFactory
     },
+
     {
       provide: HTTP_INTERCEPTORS,
       useClass: MsalInterceptor,

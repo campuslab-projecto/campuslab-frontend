@@ -1,0 +1,261 @@
+
+<section class="rabbit-page">
+
+  <header class="page-header">
+    <div>
+      <span class="eyebrow">CAMPUSLAB · ADMINISTRACIÓN</span>
+      <h2>Administración RabbitMQ</h2>
+      <p>
+        Gestiona colas, exchanges y bindings desde CampusLab,
+        mediante API Gateway y el BFF protegido con JWT.
+      </p>
+    </div>
+  </header>
+
+  <!-- VERIFICACIÓN DE PERMISOS -->
+  <div *ngIf="checkingRole" class="info-banner">
+    Verificando permisos de Microsoft Entra ID...
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <div *ngIf="success" class="success-message">
+    {{ success }}
+  </div>
+
+  <!-- PANEL EXCLUSIVO ADMIN -->
+  <ng-container *ngIf="!checkingRole && isAdmin">
+
+    <div class="info-banner">
+      <strong>Panel de administrador</strong>
+      <p>
+        Estas operaciones modifican la configuración real
+        de RabbitMQ. Utiliza nombres de prueba y evita
+        eliminar componentes utilizados por CampusLab.
+      </p>
+    </div>
+
+    <div class="rabbit-grid">
+
+      <!-- COLAS -->
+      <section class="admin-card">
+        <div class="card-heading">
+          <span class="section-tag">01 · QUEUES</span>
+          <h3>Administración de colas</h3>
+          <p>Crea o elimina colas de mensajes.</p>
+        </div>
+
+        <form (ngSubmit)="createQueue()">
+          <label for="queueName">Nombre de la cola</label>
+
+          <input
+            id="queueName"
+            name="queueName"
+            type="text"
+            [(ngModel)]="queueName"
+            placeholder="q.campuslab.prueba"
+            required
+          />
+
+          <label class="checkbox-line">
+            <input
+              type="checkbox"
+              name="queueDurable"
+              [(ngModel)]="queueDurable"
+            />
+            Cola durable
+          </label>
+
+          <button
+            class="primary-button"
+            type="submit"
+            [disabled]="loading || !queueName.trim()">
+            {{ loading ? 'Procesando...' : 'Crear cola' }}
+          </button>
+        </form>
+
+        <div class="separator"></div>
+
+        <h4>Eliminar cola</h4>
+
+        <form (ngSubmit)="deleteQueue()">
+          <label for="deleteQueueName">Nombre de la cola</label>
+
+          <input
+            id="deleteQueueName"
+            name="deleteQueueName"
+            type="text"
+            [(ngModel)]="deleteQueueName"
+            placeholder="q.campuslab.prueba"
+            required
+          />
+
+          <button
+            class="danger-button"
+            type="submit"
+            [disabled]="loading || !deleteQueueName.trim()">
+            Eliminar cola
+          </button>
+        </form>
+      </section>
+
+      <!-- EXCHANGES -->
+      <section class="admin-card">
+        <div class="card-heading">
+          <span class="section-tag">02 · EXCHANGES</span>
+          <h3>Administración de exchanges</h3>
+          <p>Configura el enrutamiento de mensajes.</p>
+        </div>
+
+        <form (ngSubmit)="createExchange()">
+          <label for="exchangeName">Nombre del exchange</label>
+
+          <input
+            id="exchangeName"
+            name="exchangeName"
+            type="text"
+            [(ngModel)]="exchangeName"
+            placeholder="campuslab.prueba.direct"
+            required
+          />
+
+          <label for="exchangeType">Tipo de exchange</label>
+
+          <select
+            id="exchangeType"
+            name="exchangeType"
+            [(ngModel)]="exchangeType">
+
+            <option value="direct">Direct</option>
+            <option value="topic">Topic</option>
+            <option value="fanout">Fanout</option>
+          </select>
+
+          <button
+            class="primary-button"
+            type="submit"
+            [disabled]="loading || !exchangeName.trim()">
+            Crear exchange
+          </button>
+        </form>
+
+        <div class="separator"></div>
+
+        <h4>Eliminar exchange</h4>
+
+        <form (ngSubmit)="deleteExchange()">
+          <label for="deleteExchangeName">
+            Nombre del exchange
+          </label>
+
+          <input
+            id="deleteExchangeName"
+            name="deleteExchangeName"
+            type="text"
+            [(ngModel)]="deleteExchangeName"
+            placeholder="campuslab.prueba.direct"
+            required
+          />
+
+          <button
+            class="danger-button"
+            type="submit"
+            [disabled]="loading || !deleteExchangeName.trim()">
+            Eliminar exchange
+          </button>
+        </form>
+      </section>
+
+      <!-- BINDINGS -->
+      <section class="admin-card">
+        <div class="card-heading">
+          <span class="section-tag">03 · BINDINGS</span>
+          <h3>Administración de bindings</h3>
+          <p>Relaciona exchanges y colas mediante routing keys.</p>
+        </div>
+
+        <form (ngSubmit)="createBinding()">
+
+          <label for="bindingQueueName">Nombre de la cola</label>
+
+          <input
+            id="bindingQueueName"
+            name="bindingQueueName"
+            type="text"
+            [(ngModel)]="bindingQueueName"
+            placeholder="q.campuslab.prueba"
+            required
+          />
+
+          <label for="bindingExchangeName">Nombre del exchange</label>
+
+          <input
+            id="bindingExchangeName"
+            name="bindingExchangeName"
+            type="text"
+            [(ngModel)]="bindingExchangeName"
+            placeholder="campuslab.prueba.direct"
+            required
+          />
+
+          <label for="bindingExchangeType">Tipo de exchange</label>
+
+          <select
+            id="bindingExchangeType"
+            name="bindingExchangeType"
+            [(ngModel)]="bindingExchangeType">
+
+            <option value="direct">Direct</option>
+            <option value="topic">Topic</option>
+            <option value="fanout">Fanout</option>
+          </select>
+
+          <label for="bindingRoutingKey">Routing key</label>
+
+          <input
+            id="bindingRoutingKey"
+            name="bindingRoutingKey"
+            type="text"
+            [(ngModel)]="bindingRoutingKey"
+            placeholder="prueba.creada"
+          />
+
+          <button
+            class="primary-button"
+            type="submit"
+            [disabled]="
+              loading ||
+              !bindingQueueName.trim() ||
+              !bindingExchangeName.trim()
+            ">
+            Crear binding
+          </button>
+
+          <button
+            class="danger-button"
+            type="button"
+            (click)="deleteBinding()"
+            [disabled]="
+              loading ||
+              !bindingQueueName.trim() ||
+              !bindingExchangeName.trim()
+            ">
+            Eliminar binding
+          </button>
+
+        </form>
+      </section>
+
+    </div>
+
+    <div class="security-note">
+      <strong>Seguridad:</strong>
+      Todas las operaciones requieren un JWT válido
+      y autorización del rol ADMIN en el BFF.
+    </div>
+
+  </ng-container>
+
+</section>

@@ -1,5 +1,8 @@
+
 import { Routes } from '@angular/router';
 import { MsalGuard } from '@azure/msal-angular';
+
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -19,6 +22,20 @@ export const routes: Routes = [
       import('./pages/bookings/bookings').then(m => m.Bookings),
     canActivate: [MsalGuard]
   },
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: '**', redirectTo: 'dashboard' }
+  {
+    path: 'rabbit-admin',
+    loadComponent: () =>
+      import('./pages/rabbit-admin/rabbit-admin')
+        .then(m => m.RabbitAdmin),
+    canActivate: [MsalGuard, adminGuard]
+  },
+  {
+    path: '',
+    redirectTo: 'dashboard',
+    pathMatch: 'full'
+  },
+  {
+    path: '**',
+    redirectTo: 'dashboard'
+  }
 ];
