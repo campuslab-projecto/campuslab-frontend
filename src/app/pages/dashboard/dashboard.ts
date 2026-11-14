@@ -1,3 +1,4 @@
+
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MsalService } from '@azure/msal-angular';
@@ -23,7 +24,12 @@ export class Dashboard implements OnInit {
     private msalService: MsalService
   ) {}
 
+  // ==========================================
+  // 1. INICIAR DASHBOARD
+  // ==========================================
+
   ngOnInit(): void {
+
     const account =
       this.msalService.instance.getActiveAccount() ??
       this.msalService.instance.getAllAccounts()[0];
@@ -39,13 +45,21 @@ export class Dashboard implements OnInit {
     this.loadApiTokenInformation(account);
   }
 
+  // ==========================================
+  // 2. OBTENER INFORMACION DEL TOKEN
+  // ==========================================
+
   private loadApiTokenInformation(account: any): void {
+
     this.msalService.acquireTokenSilent({
       account,
       scopes: protectedResources.api.scopes
     }).subscribe({
+
       next: result => {
-        const claims = this.decodeJwtPayload(result.accessToken);
+
+        const claims =
+          this.decodeJwtPayload(result.accessToken);
 
         console.log(
           'Claims del Access Token CampusLab-API:',
@@ -84,6 +98,7 @@ export class Dashboard implements OnInit {
       },
 
       error: error => {
+
         console.error(
           'No fue posible obtener el Access Token de CampusLab-API:',
           error
@@ -103,7 +118,9 @@ export class Dashboard implements OnInit {
           idClaims.scp
             ? String(idClaims.scp)
                 .split(' ')
-                .filter((scope: string) => scope.trim().length > 0)
+                .filter((scope: string) =>
+                  scope.trim().length > 0
+                )
             : [];
 
         const fallbackAudience =
@@ -122,8 +139,14 @@ export class Dashboard implements OnInit {
     });
   }
 
+  // ==========================================
+  // 3. DECODIFICAR TOKEN JWT
+  // ==========================================
+
   private decodeJwtPayload(token: string): any {
+
     try {
+
       const parts = token.split('.');
 
       if (parts.length < 2) {
@@ -165,10 +188,12 @@ export class Dashboard implements OnInit {
       return JSON.parse(decodedPayload);
 
     } catch (error) {
+
       console.error(
         'Error decodificando Access Token:',
         error
       );
+
       return {};
     }
   }
