@@ -36,80 +36,127 @@ import {
 } from './auth-config';
 
 
-// Crear la instancia de Microsoft MSAL
+// ==========================================
+// 1. CREAR INSTANCIA DE MICROSOFT MSAL
+// ==========================================
+
 export function MSALInstanceFactory(): IPublicClientApplication {
+
   return new PublicClientApplication(msalConfig);
+
 }
 
 
-// Configurar la protección de las rutas Angular
+// ==========================================
+// 2. PROTEGER LAS RUTAS DE ANGULAR
+// ==========================================
+
 export function MSALGuardConfigFactory(): MsalGuardConfiguration {
+
   return {
     interactionType: InteractionType.Redirect,
     authRequest: loginRequest,
     loginFailedRoute: '/login'
   };
+
 }
 
 
-// Configurar el interceptor que agrega el token JWT
+// ==========================================
+// 3. CONFIGURAR INTERCEPTOR JWT
+// ==========================================
+
 export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
 
   const protectedResourceMap = new Map<string, Array<string>>();
 
-  // Endpoint exacto de reservas
+  // ------------------------------------------
+  // RESERVAS EN AWS
+  // ------------------------------------------
+
   protectedResourceMap.set(
     `${protectedResources.api.endpoint}bookings`,
     protectedResources.api.scopes
   );
 
-  // Todas las subrutas de CampusLab:
-  // /api/bookings/1/status, /api/rabbit/queues, etc.
+
+  // ------------------------------------------
+  // TODAS LAS SUBRUTAS DEL BFF EN AWS
+  // Reservas, RabbitMQ, etc.
+  // ------------------------------------------
+
   protectedResourceMap.set(
     `${protectedResources.api.endpoint}*`,
     protectedResources.api.scopes
   );
 
+
+  // ------------------------------------------
+  // AUDITORIA EN EL BFF LOCAL
+  // http://localhost:8080/api/audit
+  // ------------------------------------------
+
+  protectedResourceMap.set(
+    'http://localhost:8080/api/audit*',
+    protectedResources.api.scopes
+  );
+
+
   return {
     interactionType: InteractionType.Redirect,
     protectedResourceMap
   };
+
 }
 
 
-// Configuración principal de Angular
+// ==========================================
+// 4. CONFIGURACION PRINCIPAL DE ANGULAR
+// ==========================================
+
 export const appConfig: ApplicationConfig = {
+
   providers: [
 
+    // Rutas de Angular
     provideRouter(routes),
 
+    // Cliente HTTP con interceptores
     provideHttpClient(withInterceptorsFromDi()),
 
+    // Modulo de Microsoft MSAL
     importProvidersFrom(MsalModule),
 
+    // Instancia MSAL
     {
       provide: MSAL_INSTANCE,
       useFactory: MSALInstanceFactory
     },
 
+    // Configuracion de rutas protegidas
     {
       provide: MSAL_GUARD_CONFIG,
       useFactory: MSALGuardConfigFactory
     },
 
+    // Configuracion del interceptor JWT
     {
       provide: MSAL_INTERCEPTOR_CONFIG,
       useFactory: MSALInterceptorConfigFactory
     },
 
+    // Registrar interceptor MSAL
     {
       provide: HTTP_INTERCEPTORS,
       useClass: MsalInterceptor,
       multi: true
     },
 
+    // Servicios MSAL
     MsalService,
     MsalGuard,
     MsalBroadcastService
+
   ]
+
 };

@@ -1,0 +1,116 @@
+
+<section class="audit-page">
+
+  <div class="page-header">
+    <span class="eyebrow">CAMPUSLAB · SEGURIDAD</span>
+
+    <h2>Auditoría del sistema</h2>
+
+    <p>
+      Consulta y supervisa los eventos registrados
+      dentro de CampusLab.
+    </p>
+  </div>
+
+  <div class="information">
+    <strong>Registro de actividades</strong>
+
+    <p>
+      Este módulo muestra los eventos generados por
+      las reservas de CampusLab, procesados mediante
+      Apache Kafka y almacenados en el microservicio
+      de Auditoría.
+    </p>
+  </div>
+
+  <div class="audit-panel">
+
+    <div class="panel-header">
+      <div>
+        <h3>Historial de eventos</h3>
+
+        <p>
+          Registro de creación y cambios de estado
+          de las reservas del sistema.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="loadEvents()"
+        [disabled]="loading">
+        {{ loading ? 'Actualizando...' : 'Actualizar' }}
+      </button>
+    </div>
+
+    <div class="filters">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Buscar por evento, reserva o estado..."
+      />
+    </div>
+
+    <div class="table-container">
+
+      <p *ngIf="loading" class="loading-state">
+        Cargando eventos de auditoría...
+      </p>
+
+      <p *ngIf="errorMessage" class="error-state">
+        {{ errorMessage }}
+      </p>
+
+      <table *ngIf="!loading && !errorMessage">
+
+        <thead>
+          <tr>
+            <th>Fecha del evento</th>
+            <th>Tipo de evento</th>
+            <th>ID de reserva</th>
+            <th>Estado</th>
+            <th>Fecha de recepción</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr *ngFor="let event of filteredEvents">
+
+            <td>
+              {{ event.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}
+            </td>
+
+            <td>
+              {{ event.eventType }}
+            </td>
+
+            <td>
+              {{ event.bookingId }}
+            </td>
+
+            <td>
+              {{ event.status }}
+            </td>
+
+            <td>
+              {{ event.receivedAt | date:'dd/MM/yyyy HH:mm:ss' }}
+            </td>
+
+          </tr>
+
+          <tr *ngIf="filteredEvents.length === 0">
+            <td colspan="5" class="empty-state">
+              No se encontraron eventos de auditoría.
+            </td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</section>
