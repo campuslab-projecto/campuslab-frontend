@@ -1,7 +1,7 @@
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 export interface AuditEvent {
   id: number;
@@ -18,24 +18,25 @@ export interface AuditEvent {
 })
 export class AuditService {
 
-  // BFF local para pruebas de Auditoría.
+  // MS Audit a traves de API Gateway y BFF
   private readonly apiUrl =
     'http://localhost:8080/api/audit';
 
   constructor(private http: HttpClient) {}
 
-  // Obtener todos los eventos de Auditoría.
+  // Obtener todos los eventos de auditoria
   getEvents(): Observable<AuditEvent[]> {
     return this.http.get<AuditEvent[]>(this.apiUrl);
   }
 
-  // Obtener eventos de una reserva específica.
+  // Filtrar eventos por reserva usando la consulta general
   getEventsByBookingId(
     bookingId: number
   ): Observable<AuditEvent[]> {
-
-    return this.http.get<AuditEvent[]>(
-      `${this.apiUrl}/bookings/${bookingId}`
+    return this.getEvents().pipe(
+      map(events =>
+        events.filter(event => event.bookingId === bookingId)
+      )
     );
   }
 }
