@@ -1,17 +1,31 @@
 
 import { CommonModule } from '@angular/common';
-import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
+import {
+  Component,
+  ChangeDetectorRef,
+  OnInit
+} from '@angular/core';
+
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse
+} from '@angular/common/http';
+
 import { finalize, Observable } from 'rxjs';
 import { MsalService } from '@azure/msal-angular';
-
 import { protectedResources } from '../../auth-config';
 
 const API_URL =
   'https://ok83lxm1s3.execute-api.us-east-1.amazonaws.com/api/rabbit';
 
 type ExchangeType = 'direct' | 'topic' | 'fanout';
+
+interface OperationEntry {
+  message: string;
+  success: boolean;
+  date: Date;
+}
 
 @Component({
   selector: 'app-rabbit-admin',
@@ -29,19 +43,26 @@ export class RabbitAdmin implements OnInit {
   success = '';
   error = '';
 
+  // COLAS
   queueName = '';
   queueDurable = true;
   deleteQueueName = '';
 
+  // EXCHANGES
   exchangeName = '';
   exchangeType: ExchangeType = 'direct';
   deleteExchangeName = '';
 
+  // BINDINGS
   bindingQueueName = '';
   bindingExchangeName = '';
   bindingExchangeType: ExchangeType = 'direct';
   bindingRoutingKey = '';
 
+  // HISTORIAL LOCAL DE ESTA SESION
+  operations: OperationEntry[] = [];
+
+  // RECURSOS PROTEGIDOS
   private readonly protectedQueues = [
     'q.cmd.email',
     'q.cmd.prep',
@@ -67,9 +88,9 @@ export class RabbitAdmin implements OnInit {
     this.checkAdminRole();
   }
 
-  // ====================================
-  // 1. COMPROBAR ROL ADMIN
-  // ====================================
+  // ==========================================
+  // 1. VERIFICAR ADMIN
+  // ==========================================
 
   private checkAdminRole(): void {
 
@@ -94,6 +115,10 @@ export class RabbitAdmin implements OnInit {
         try {
           const payload = result.accessToken.split('.')[1];
 
+          if (!payload) {
+            throw new Error('Token inválido');
+          }
+
           const normalized = payload
             .replace(/-/g, '+')
             .replace(/_/g, '/');
@@ -103,15 +128,31 @@ export class RabbitAdmin implements OnInit {
             '='
           );
 
-          const claims = JSON.parse(atob(padded));
+          const binary = atob(padded);
 
-          const roles: string[] = Array.isArray(claims.roles)
-            ? claims.roles
-            : [];
+          const bytes = Uint8Array.from(
+            binary,
+            character => character.charCodeAt(0)
+          );
+
+          const claims = JSON.parse(
+            new TextDecoder().decode(bytes)
+          ) as Record<string, unknown>;
+
+          const rolesClaim = claims['roles'];
+
+          const roles: string[] =
+            Array.isArray(rolesClaim)
+              ? rolesClaim.map(
+                  (role: unknown) => String(role)
+                )
+              : rolesClaim
+                ? [String(rolesClaim)]
+                : [];
 
           this.isAdmin = roles.some(role => {
 
-            const clean = String(role)
+            const clean = role
               .normalize('NFD')
               .replace(/[\u0300-\u036f]/g, '')
               .trim()
@@ -126,25 +167,42 @@ export class RabbitAdmin implements OnInit {
               'Acceso restringido. Se requiere el rol ADMIN.';
           }
 
-        } catch {
-          this.error = 'No se pudieron verificar los roles.';
+        } catch (err) {
+
+          console.error(
+            'Error verificando roles:',
+            err
+          );
+
+          this.isAdmin = false;
+          this.error =
+            'No se pudieron verificar los roles.';
         }
 
         this.checkingRole = false;
         this.cdr.markForCheck();
       },
 
-      error: () => {
-        this.error = 'No fue posible verificar el rol ADMIN.';
+      error: err => {
+
+        console.error(
+          'Error obteniendo token:',
+          err
+        );
+
+        this.isAdmin = false;
+        this.error =
+          'No fue posible verificar el rol ADMIN.';
+
         this.checkingRole = false;
         this.cdr.markForCheck();
       }
     });
   }
 
-  // ====================================
-  // 2. EJECUTAR PETICIONES HTTP
-  // ====================================
+  // ==========================================
+  // 2. EJECUTAR OPERACIONES
+  // ==========================================
 
   private execute(
     request: Observable<string>,
@@ -158,6 +216,7 @@ export class RabbitAdmin implements OnInit {
     this.loading = true;
     this.error = '';
     this.success = '';
+
     this.cdr.markForCheck();
 
     request.pipe(
@@ -168,33 +227,86 @@ export class RabbitAdmin implements OnInit {
     ).subscribe({
 
       next: () => {
+
         this.success = successMessage;
+
+        this.addOperation(
+          successMessage,
+          true
+        );
+
         this.cdr.markForCheck();
       },
 
       error: (err: HttpErrorResponse) => {
 
         if (err.status === 403) {
+
           this.error =
             'Operación prohibida: no tienes permisos o el recurso está protegido.';
+
         } else if (err.status === 401) {
+
           this.error =
             'Tu sesión no fue autorizada. Vuelve a iniciar sesión.';
+
+        } else if (err.status === 0) {
+
+          this.error =
+            'No fue posible conectar con RabbitMQ Admin.';
+
         } else {
+
           this.error =
             `No se pudo completar la operación (HTTP ${err.status}).`;
         }
+
+        this.addOperation(
+          this.error,
+          false
+        );
 
         this.cdr.markForCheck();
       }
     });
   }
 
-  // ====================================
-  // 3. VALIDACIONES DE SEGURIDAD
-  // ====================================
+  private addOperation(
+    message: string,
+    success: boolean
+  ): void {
 
-  private isProtectedQueue(name: string): boolean {
+    this.operations = [
+      {
+        message,
+        success,
+        date: new Date()
+      },
+      ...this.operations
+    ].slice(0, 8);
+  }
+
+  get successfulOperations(): number {
+
+    return this.operations.filter(
+      operation => operation.success
+    ).length;
+  }
+
+  get failedOperations(): number {
+
+    return this.operations.filter(
+      operation => !operation.success
+    ).length;
+  }
+
+  // ==========================================
+  // 3. RECURSOS PROTEGIDOS
+  // ==========================================
+
+  private isProtectedQueue(
+    name: string
+  ): boolean {
 
     const clean = name.trim();
 
@@ -203,7 +315,9 @@ export class RabbitAdmin implements OnInit {
            clean.startsWith('amq.');
   }
 
-  private isProtectedExchange(name: string): boolean {
+  private isProtectedExchange(
+    name: string
+  ): boolean {
 
     const clean = name.trim();
 
@@ -213,21 +327,35 @@ export class RabbitAdmin implements OnInit {
   }
 
   private showProtectedError(): void {
+
     this.success = '';
+
     this.error =
       'Este componente está protegido porque forma parte de la infraestructura de CampusLab.';
+
+    this.addOperation(
+      this.error,
+      false
+    );
+
     this.cdr.markForCheck();
   }
 
-  // ====================================
+  // ==========================================
   // 4. CREAR COLA
-  // ====================================
+  // ==========================================
 
   createQueue(): void {
 
+    if (!this.isAdmin || this.loading) {
+      return;
+    }
+
     const name = this.queueName.trim();
 
-    if (!name) return;
+    if (!name) {
+      return;
+    }
 
     if (this.isProtectedQueue(name)) {
       this.showProtectedError();
@@ -247,15 +375,21 @@ export class RabbitAdmin implements OnInit {
     );
   }
 
-  // ====================================
+  // ==========================================
   // 5. ELIMINAR COLA
-  // ====================================
+  // ==========================================
 
   deleteQueue(): void {
 
+    if (!this.isAdmin || this.loading) {
+      return;
+    }
+
     const name = this.deleteQueueName.trim();
 
-    if (!name) return;
+    if (!name) {
+      return;
+    }
 
     if (this.isProtectedQueue(name)) {
       this.showProtectedError();
@@ -263,11 +397,13 @@ export class RabbitAdmin implements OnInit {
     }
 
     const confirmed = window.confirm(
-      `¿Estás seguro de que deseas eliminar la cola "${name}"?\n\n` +
-      'Esta operación puede eliminar los mensajes almacenados en ella.'
+      `¿Estás seguro de eliminar la cola "${name}"?\n\n` +
+      'Esta operación puede eliminar los mensajes almacenados.'
     );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
     this.execute(
       this.http.delete(
@@ -278,15 +414,21 @@ export class RabbitAdmin implements OnInit {
     );
   }
 
-  // ====================================
+  // ==========================================
   // 6. CREAR EXCHANGE
-  // ====================================
+  // ==========================================
 
   createExchange(): void {
 
+    if (!this.isAdmin || this.loading) {
+      return;
+    }
+
     const name = this.exchangeName.trim();
 
-    if (!name) return;
+    if (!name) {
+      return;
+    }
 
     if (this.isProtectedExchange(name)) {
       this.showProtectedError();
@@ -306,15 +448,21 @@ export class RabbitAdmin implements OnInit {
     );
   }
 
-  // ====================================
+  // ==========================================
   // 7. ELIMINAR EXCHANGE
-  // ====================================
+  // ==========================================
 
   deleteExchange(): void {
 
+    if (!this.isAdmin || this.loading) {
+      return;
+    }
+
     const name = this.deleteExchangeName.trim();
 
-    if (!name) return;
+    if (!name) {
+      return;
+    }
 
     if (this.isProtectedExchange(name)) {
       this.showProtectedError();
@@ -322,11 +470,13 @@ export class RabbitAdmin implements OnInit {
     }
 
     const confirmed = window.confirm(
-      `¿Estás seguro de que deseas eliminar el exchange "${name}"?\n\n` +
+      `¿Estás seguro de eliminar el exchange "${name}"?\n\n` +
       'Los bindings asociados pueden quedar eliminados.'
     );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
     this.execute(
       this.http.delete(
@@ -337,14 +487,20 @@ export class RabbitAdmin implements OnInit {
     );
   }
 
-  // ====================================
+  // ==========================================
   // 8. CREAR BINDING
-  // ====================================
+  // ==========================================
 
   createBinding(): void {
 
-    if (!this.bindingQueueName.trim() ||
-        !this.bindingExchangeName.trim()) {
+    if (!this.isAdmin || this.loading) {
+      return;
+    }
+
+    if (
+      !this.bindingQueueName.trim() ||
+      !this.bindingExchangeName.trim()
+    ) {
       return;
     }
 
@@ -366,14 +522,20 @@ export class RabbitAdmin implements OnInit {
     );
   }
 
-  // ====================================
+  // ==========================================
   // 9. ELIMINAR BINDING
-  // ====================================
+  // ==========================================
 
   deleteBinding(): void {
 
-    if (!this.bindingQueueName.trim() ||
-        !this.bindingExchangeName.trim()) {
+    if (!this.isAdmin || this.loading) {
+      return;
+    }
+
+    if (
+      !this.bindingQueueName.trim() ||
+      !this.bindingExchangeName.trim()
+    ) {
       return;
     }
 
@@ -390,7 +552,9 @@ export class RabbitAdmin implements OnInit {
       `y "${this.bindingQueueName}"?`
     );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
     this.execute(
       this.http.request(
@@ -405,9 +569,9 @@ export class RabbitAdmin implements OnInit {
     );
   }
 
-  // ====================================
+  // ==========================================
   // 10. DATOS DEL BINDING
-  // ====================================
+  // ==========================================
 
   private bindingPayload() {
 

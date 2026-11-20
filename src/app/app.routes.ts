@@ -33,7 +33,7 @@ export const routes: Routes = [
     canActivate: [MsalGuard]
   },
 
-  // RABBITMQ ADMIN
+  // RABBITMQ ADMIN - SOLO ADMINISTRADOR
   {
     path: 'rabbit-admin',
     loadComponent: () =>
@@ -42,7 +42,16 @@ export const routes: Routes = [
     canActivate: [MsalGuard, adminGuard]
   },
 
-  // AUDITORÍA
+  // KAFKA ADMIN - SOLO ADMINISTRADOR
+  {
+    path: 'kafka-admin',
+    loadComponent: () =>
+      import('./pages/kafka-admin/kafka-admin')
+        .then(m => m.KafkaAdmin),
+    canActivate: [MsalGuard, adminGuard]
+  },
+
+  // AUDITORÍA - AUDITOR Y ADMIN
   {
     path: 'audit',
     loadComponent: () =>

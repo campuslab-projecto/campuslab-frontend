@@ -1,431 +1,685 @@
+
 <section class="dashboard-page">
 
-  <div class="hero-card">
+  <!-- ======================================
+       ENCABEZADO PRINCIPAL
+       ====================================== -->
+
+  <header class="dashboard-header">
 
     <div>
-      <span class="eyebrow">CampusLab</span>
+      <span class="page-eyebrow">
+        CAMPUSLAB / VISTA GENERAL
+      </span>
 
-      <h2>Panel principal</h2>
+      <h2>Panel de operaciones</h2>
 
       <p>
-        Vista protegida mediante MSAL y Azure AD.
-        Desde aquí puedes revisar el estado general
-        del sistema de reservas académicas.
+        Tu espacio de trabajo para la gestión
+        académica de laboratorios y equipos.
       </p>
     </div>
 
-    <div class="security-badge">
-      <span>MSAL Guard</span>
-      <strong>Activo</strong>
-    </div>
-
-  </div>
-
-
-  <div class="stats-grid">
-
-    <article class="stat-card">
-
-      <span>Usuario</span>
-
-      <strong>
-        {{ name }}
-      </strong>
-
-      <p>
-        {{ username }}
-      </p>
-
-    </article>
-
-
-    <article class="stat-card">
-
-      <span>Roles</span>
-
-      <strong>
-        {{ roles().length }}
-      </strong>
-
-      <p>
-        {{
-          roles().length
-            ? roles().join(', ')
-            : 'Sin roles asignados'
-        }}
-      </p>
-
-    </article>
-
-
-    <article class="stat-card">
-
-      <span>Scopes</span>
-
-      <strong>
-        {{ scopes().length }}
-      </strong>
-
-      <p>
-        {{
-          scopes().length
-            ? scopes().join(', ')
-            : 'Sin scopes visibles'
-        }}
-      </p>
-
-    </article>
-
-
-    <article class="stat-card">
-
-      <span>Seguridad</span>
-
-      <strong>
-        JWT
-      </strong>
-
-      <p>
-        Token validado por el BFF
-      </p>
-
-    </article>
-
-  </div>
-
-
-  <div class="content-grid">
-
-    <section class="info-card">
-
-      <h3>
-        Información de sesión
-      </h3>
-
-
-      <div class="info-row">
-
-        <span>
-          Nombre
-        </span>
-
-        <strong>
-          {{ name }}
-        </strong>
-
-      </div>
-
-
-      <div class="info-row">
-
-        <span>
-          Usuario
-        </span>
-
-        <strong>
-          {{ username }}
-        </strong>
-
-      </div>
-
-
-      <div class="info-row">
-
-        <span>
-          Roles
-        </span>
-
-        <strong>
-          {{
-            roles().length
-              ? roles().join(', ')
-              : 'Sin roles asignados'
-          }}
-        </strong>
-
-      </div>
-
-
-      <div class="info-row">
-
-        <span>
-          Scopes
-        </span>
-
-        <strong>
-          {{
-            scopes().length
-              ? scopes().join(', ')
-              : 'Sin scopes visibles'
-          }}
-        </strong>
-
-      </div>
-
-
-      <div class="info-row">
-
-        <span>
-          Audience del token
-        </span>
-
-        <strong>
-          {{
-            audience()
-              ? audience()
-              : 'No disponible'
-          }}
-        </strong>
-
-      </div>
-
-    </section>
-
-
-    <section class="info-card">
-
-      <h3>
-        Resumen operacional CampusLab
-      </h3>
-
-
-      <div class="timeline">
-
-        <div class="timeline-item">
-
-          <span></span>
-
-          <div>
-
-            <strong>
-              Autenticación corporativa
-            </strong>
-
-            <p>
-              Inicio de sesión mediante
-              Azure AD y MSAL Angular.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <div class="timeline-item">
-
-          <span></span>
-
-          <div>
-
-            <strong>
-              Rutas protegidas
-            </strong>
-
-            <p>
-              Dashboard y reservas protegidas
-              mediante MsalGuard.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <div class="timeline-item">
-
-          <span></span>
-
-          <div>
-
-            <strong>
-              Consumo seguro del backend
-            </strong>
-
-            <p>
-              El frontend envía Bearer Token al BFF
-              usando MsalInterceptor.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <div class="timeline-item">
-
-          <span></span>
-
-          <div>
-
-            <strong>
-              Microservicio de reservas
-            </strong>
-
-            <p>
-              El BFF deriva solicitudes hacia
-              ms-campuslab-bookings.
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  </div>
-
-
-  <section class="feature-card">
-
-    <span class="feature-pill">
-      EP3
+    <span class="role-pill">
+      <span class="role-dot"></span>
+      {{ primaryRole }}
     </span>
 
-    <h3>
-      Integraciones Cloud Native
-    </h3>
+  </header>
 
-    <p class="feature-description">
-      Arquitectura incorporada para mensajería asíncrona,
-      persistencia cloud y administración de RabbitMQ.
-    </p>
+  <!-- ======================================
+       BIENVENIDA PERSONALIZADA
+       ====================================== -->
 
+  <section class="welcome-banner">
 
-    <div class="integration-grid">
+    <div class="welcome-content">
 
-      <article class="integration-item">
+      <span class="welcome-kicker">
+        PLATAFORMA CAMPUSLAB
+      </span>
 
-        <h4>
-          RabbitMQ
-        </h4>
+      <h3>
+        ¡Hola, {{ firstName }}!
+      </h3>
 
-        <span class="integration-badge success">
-          Integrado
+      <p>
+        {{ welcomeDescription }}
+      </p>
+
+      <a
+        *ngIf="canManageBookings || isStudentOnly"
+        routerLink="/bookings"
+        class="welcome-action">
+        Ir a reservas
+        <span aria-hidden="true">→</span>
+      </a>
+
+      <a
+        *ngIf="canViewAudit && !canManageBookings"
+        routerLink="/audit"
+        class="welcome-action">
+        Consultar auditoría
+        <span aria-hidden="true">→</span>
+      </a>
+
+    </div>
+
+    <div class="welcome-decoration" aria-hidden="true">
+      <div class="decoration-circle circle-one"></div>
+      <div class="decoration-circle circle-two"></div>
+      <div class="decoration-icon">CL</div>
+    </div>
+
+  </section>
+
+  <!-- ======================================
+       ESTADO DE LA IDENTIDAD
+       ====================================== -->
+
+  <div
+    class="dashboard-notice"
+    *ngIf="loadingIdentity">
+
+    <span class="loading-dot"></span>
+    Verificando la identidad y los roles de Microsoft...
+  </div>
+
+  <!-- ======================================
+       VISTA ADMINISTRADOR Y TECNICO
+       ====================================== -->
+
+  <ng-container
+    *ngIf="!loadingIdentity && canManageBookings">
+
+    <div class="section-heading">
+
+      <div>
+        <span class="section-kicker">
+          OPERACIONES
         </span>
 
+        <h3>Resumen de reservas</h3>
+
         <p>
-          Mensajería desacoplada mediante colas,
-          exchanges, bindings y routing keys.
+          Indicadores calculados a partir del
+          listado devuelto por CampusLab.
         </p>
+      </div>
+
+      <button
+        class="refresh-button"
+        type="button"
+        (click)="loadBookings()"
+        [disabled]="loadingBookings">
+
+        {{
+          loadingBookings
+            ? 'Consultando...'
+            : '↻ Actualizar datos'
+        }}
+
+      </button>
+
+    </div>
+
+    <!-- ERROR -->
+    <div
+      class="dashboard-error"
+      *ngIf="bookingsError">
+
+      {{ bookingsError }}
+
+    </div>
+
+    <!-- TARJETAS DE INDICADORES -->
+    <div class="stats-grid">
+
+      <article class="stat-card">
+
+        <span class="stat-icon stat-blue">
+          ▤
+        </span>
+
+        <span class="stat-label">
+          Reservas totales
+        </span>
+
+        <strong class="stat-value">
+          {{
+            bookingsLoaded
+              ? (totalBookings | number)
+              : '—'
+          }}
+        </strong>
+
+        <p>Total de registros consultados</p>
 
       </article>
 
+      <article class="stat-card">
 
-      <article class="integration-item">
-
-        <h4>
-          ms-notify
-        </h4>
-
-        <span class="integration-badge success">
-          Consumers
+        <span class="stat-icon stat-orange">
+          ◷
         </span>
 
-        <p>
-          Procesamiento asíncrono de notificaciones,
-          tickets de preparación y vouchers.
-        </p>
+        <span class="stat-label">
+          Solicitudes pendientes
+        </span>
+
+        <strong class="stat-value">
+          {{
+            bookingsLoaded
+              ? (pendingBookings | number)
+              : '—'
+          }}
+        </strong>
+
+        <p>Reservas en estado solicitada</p>
 
       </article>
 
+      <article class="stat-card">
 
-      <article class="integration-item">
-
-        <h4>
-          Dead Letter Queues
-        </h4>
-
-        <span class="integration-badge success">
-          Configuradas
+        <span class="stat-icon stat-cyan">
+          ◈
         </span>
 
-        <p>
-          Manejo de mensajes que no pueden ser procesados
-          mediante DLQ y confirmación manual.
-        </p>
+        <span class="stat-label">
+          En uso
+        </span>
+
+        <strong class="stat-value">
+          {{
+            bookingsLoaded
+              ? (activeBookings | number)
+              : '—'
+          }}
+        </strong>
+
+        <p>Reservas actualmente marcadas en uso</p>
 
       </article>
 
+      <article class="stat-card">
 
-      <article class="integration-item">
-
-        <h4>
-          AWS RDS
-        </h4>
-
-        <span class="integration-badge success">
-          PostgreSQL
+        <span class="stat-icon stat-green">
+          ✓
         </span>
 
-        <p>
-          Persistencia cloud de reservas mediante
-          PostgreSQL, JPA e Hibernate.
-        </p>
-
-      </article>
-
-
-      <article class="integration-item">
-
-        <h4>
-          Rabbit Admin
-        </h4>
-
-        <span class="integration-badge success">
-          REST API
+        <span class="stat-label">
+          Devueltas
         </span>
 
-        <p>
-          Administración de colas, exchanges y bindings
-          mediante un microservicio independiente.
-        </p>
+        <strong class="stat-value">
+          {{
+            bookingsLoaded
+              ? (completedBookings | number)
+              : '—'
+          }}
+        </strong>
+
+        <p>Reservas con devolución registrada</p>
 
       </article>
 
     </div>
 
+    <!-- CONTENIDO OPERACIONAL -->
+    <div class="operations-grid">
 
-    <div class="flow-strip">
+      <!-- DISTRIBUCION DE ESTADOS -->
+      <section class="dashboard-card">
 
-      <span>
-        Reserva
-      </span>
+        <div class="card-heading">
 
-      <span>
-        →
-      </span>
+          <div>
+            <span class="section-kicker">
+              ANALÍTICA DE RESERVAS
+            </span>
 
-      <span>
-        ms-bookings
-      </span>
+            <h3>Distribución por estado</h3>
 
-      <span>
-        →
-      </span>
+            <p>
+              Proporción de los estados registrados.
+            </p>
+          </div>
 
-      <span>
-        RabbitMQ
-      </span>
+          <span class="card-tag">
+            DATOS ACTUALES
+          </span>
 
-      <span>
-        →
-      </span>
+        </div>
 
-      <span>
-        ms-notify
-      </span>
+        <div
+          class="placeholder-state"
+          *ngIf="!bookingsLoaded && !loadingBookings">
 
-      <span>
-        →
-      </span>
+          <span class="placeholder-icon">▥</span>
 
-      <span>
-        Email / Ticket / Voucher
-      </span>
+          <strong>
+            Sin datos cargados
+          </strong>
+
+          <p>
+            Actualiza los datos para ver
+            las estadísticas de reservas.
+          </p>
+
+        </div>
+
+        <div
+          class="placeholder-state"
+          *ngIf="loadingBookings">
+
+          <span class="loading-dot"></span>
+          Consultando reservas...
+        </div>
+
+        <ng-container
+          *ngIf="bookingsLoaded && !loadingBookings">
+
+          <div
+            class="placeholder-state"
+            *ngIf="totalBookings === 0">
+
+            <strong>No hay reservas registradas</strong>
+
+            <p>
+              El servicio devolvió una lista vacía.
+            </p>
+
+          </div>
+
+          <div
+            class="status-chart"
+            *ngIf="totalBookings > 0">
+
+            <div
+              class="chart-row"
+              *ngFor="
+                let metric of statusMetrics;
+                trackBy: trackMetric
+              ">
+
+              <div class="chart-label">
+
+                <span>{{ metric.label }}</span>
+
+                <strong>{{ metric.count }}</strong>
+
+              </div>
+
+              <div class="chart-track">
+
+                <div
+                  class="chart-bar"
+                  [style.width.%]="metric.percent"
+                  [style.backgroundColor]="metric.color">
+                </div>
+
+              </div>
+
+              <span class="chart-percent">
+                {{ metric.percent | number:'1.0-1' }}%
+              </span>
+
+            </div>
+
+          </div>
+
+        </ng-container>
+
+        <p class="card-footnote" *ngIf="lastUpdated">
+          Última consulta:
+          {{ lastUpdated | date:'dd/MM/yyyy HH:mm' }}
+        </p>
+
+      </section>
+
+      <!-- RESERVAS RECIENTES -->
+      <section class="dashboard-card">
+
+        <div class="card-heading">
+
+          <div>
+            <span class="section-kicker">
+              SEGUIMIENTO
+            </span>
+
+            <h3>Reservas consultadas</h3>
+
+            <p>
+              Primeros registros de la respuesta del servicio.
+            </p>
+          </div>
+
+          <a
+            routerLink="/bookings"
+            class="text-action">
+            Ver todas →
+          </a>
+
+        </div>
+
+        <div
+          class="placeholder-state"
+          *ngIf="!bookingsLoaded && !loadingBookings">
+
+          <span class="placeholder-icon">▤</span>
+
+          <strong>Sin registros cargados</strong>
+
+          <p>
+            El listado aparecerá al consultar
+            el servicio de reservas.
+          </p>
+
+        </div>
+
+        <div
+          class="placeholder-state"
+          *ngIf="loadingBookings">
+
+          <span class="loading-dot"></span>
+          Consultando listado...
+        </div>
+
+        <div
+          class="placeholder-state"
+          *ngIf="
+            bookingsLoaded &&
+            !loadingBookings &&
+            recentBookings.length === 0
+          ">
+
+          <strong>No hay reservas disponibles</strong>
+
+        </div>
+
+        <div
+          class="recent-bookings"
+          *ngIf="
+            bookingsLoaded &&
+            !loadingBookings &&
+            recentBookings.length > 0
+          ">
+
+          <div
+            class="recent-booking"
+            *ngFor="
+              let booking of recentBookings;
+              trackBy: trackBooking
+            ">
+
+            <span class="booking-symbol">▤</span>
+
+            <div class="booking-info">
+
+              <strong>
+                Reserva #{{ booking.id }}
+              </strong>
+
+              <span>
+                {{ booking.resource }}
+              </span>
+
+              <small>
+                {{ formatBookingDate(booking.date) }}
+              </small>
+
+            </div>
+
+            <span
+              class="booking-status"
+              [ngClass]="'status-' + booking.status.toLowerCase()">
+
+              {{ getStatusLabel(booking.status) }}
+
+            </span>
+
+          </div>
+
+        </div>
+
+      </section>
 
     </div>
+
+  </ng-container>
+
+  <!-- ======================================
+       VISTA ESTUDIANTE
+       ====================================== -->
+
+  <section
+    class="dashboard-card role-workspace"
+    *ngIf="!loadingIdentity && isStudentOnly">
+
+    <div class="workspace-symbol">▤</div>
+
+    <div>
+      <span class="section-kicker">
+        ESPACIO ESTUDIANTE
+      </span>
+
+      <h3>Gestiona tus reservas académicas</h3>
+
+      <p>
+        Ingresa a Mis reservas para consultar
+        tus solicitudes, revisar sus estados
+        y utilizar las acciones disponibles.
+      </p>
+
+      <a routerLink="/bookings" class="action-link">
+        Ir a mis reservas →
+      </a>
+    </div>
+
+  </section>
+
+  <!-- ======================================
+       VISTA AUDITOR
+       ====================================== -->
+
+  <section
+    class="dashboard-card role-workspace"
+    *ngIf="
+      !loadingIdentity &&
+      hasRole('AUDITOR') &&
+      !canManageBookings &&
+      !isStudentOnly
+    ">
+
+    <div class="workspace-symbol">◷</div>
+
+    <div>
+      <span class="section-kicker">
+        ESPACIO DE AUDITORÍA
+      </span>
+
+      <h3>Trazabilidad de eventos académicos</h3>
+
+      <p>
+        Consulta los registros de auditoría
+        para revisar las operaciones y eventos
+        disponibles en CampusLab.
+      </p>
+
+      <a routerLink="/audit" class="action-link">
+        Abrir auditoría →
+      </a>
+    </div>
+
+  </section>
+
+  <!-- ======================================
+       ACCESOS RAPIDOS
+       ====================================== -->
+
+  <section
+    class="quick-section"
+    *ngIf="!loadingIdentity && roles.length > 0">
+
+    <div class="section-heading">
+
+      <div>
+        <span class="section-kicker">
+          TU ESPACIO DE TRABAJO
+        </span>
+
+        <h3>Accesos rápidos</h3>
+
+        <p>
+          Herramientas disponibles según
+          los roles de tu cuenta.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="quick-grid">
+
+      <a
+        *ngIf="canManageBookings || isStudentOnly"
+        routerLink="/bookings"
+        class="quick-card">
+
+        <span class="quick-icon quick-blue">▤</span>
+
+        <strong>Reservas</strong>
+
+        <p>
+          Consulta y gestiona solicitudes académicas.
+        </p>
+
+        <span class="quick-arrow">↗</span>
+
+      </a>
+
+      <a
+        *ngIf="hasRole('ADMIN')"
+        routerLink="/rabbit-admin"
+        class="quick-card">
+
+        <span class="quick-icon quick-purple">◎</span>
+
+        <strong>RabbitMQ</strong>
+
+        <p>
+          Administra y consulta los recursos
+          de mensajería.
+        </p>
+
+        <span class="quick-arrow">↗</span>
+
+      </a>
+
+      <a
+        *ngIf="hasRole('ADMIN')"
+        routerLink="/kafka-admin"
+        class="quick-card">
+
+        <span class="quick-icon quick-cyan">◈</span>
+
+        <strong>Kafka</strong>
+
+        <p>
+          Consulta tópicos, consumidores
+          y monitoreo DLT.
+        </p>
+
+        <span class="quick-arrow">↗</span>
+
+      </a>
+
+      <a
+        *ngIf="canViewAudit"
+        routerLink="/audit"
+        class="quick-card">
+
+        <span class="quick-icon quick-orange">◷</span>
+
+        <strong>Auditoría</strong>
+
+        <p>
+          Revisa la trazabilidad de eventos.
+        </p>
+
+        <span class="quick-arrow">↗</span>
+
+      </a>
+
+    </div>
+
+  </section>
+
+  <!-- ======================================
+       SEGURIDAD E INTEGRACIONES
+       ====================================== -->
+
+  <section
+    class="technical-section"
+    *ngIf="!loadingIdentity">
+
+    <details class="technical-details">
+
+      <summary>
+        <span>◇</span>
+        Información técnica de la sesión
+        <span class="summary-hint">Ver detalles</span>
+      </summary>
+
+      <div class="technical-content">
+
+        <div class="technical-row">
+          <span>Usuario</span>
+          <strong>{{ username }}</strong>
+        </div>
+
+        <div class="technical-row">
+          <span>Rol principal</span>
+          <strong>{{ primaryRole }}</strong>
+        </div>
+
+        <div class="technical-row">
+          <span>Roles del token</span>
+          <strong>
+            {{
+              roles.length
+                ? roles.join(', ')
+                : 'Sin roles asignados'
+            }}
+          </strong>
+        </div>
+
+        <div class="technical-row">
+          <span>Scopes</span>
+          <strong>
+            {{
+              scopes.length
+                ? scopes.join(', ')
+                : 'No disponibles'
+            }}
+          </strong>
+        </div>
+
+        <div class="technical-row">
+          <span>Audience</span>
+          <strong>
+            {{ audience || 'No disponible' }}
+          </strong>
+        </div>
+
+        <p class="technical-note">
+          CampusLab utiliza Microsoft Entra ID y MSAL
+          para la autenticación. Los permisos de las
+          operaciones deben validarse también en el backend.
+        </p>
+
+      </div>
+
+    </details>
 
   </section>
 

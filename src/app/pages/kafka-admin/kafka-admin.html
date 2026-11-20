@@ -1,0 +1,854 @@
+
+<section class="kafka-admin">
+
+  <!-- ENCABEZADO -->
+  <header class="kafka-header">
+    <div>
+      <span class="eyebrow">
+        CAMPUSLAB / INFRAESTRUCTURA
+      </span>
+
+      <h2>Kafka Admin</h2>
+
+      <p>
+        Monitoreo de tópicos, particiones,
+        consumidores y Dead Letter Topics.
+      </p>
+    </div>
+
+    <span class="admin-pill" *ngIf="isAdmin">
+      <span class="admin-dot"></span>
+      Administrador
+    </span>
+  </header>
+
+  <!-- VERIFICACION -->
+  <div class="state-card" *ngIf="checkingRole">
+    Verificando permisos de administrador...
+  </div>
+
+  <!-- ACCESO DENEGADO -->
+  <div
+    *ngIf="!checkingRole && !isAdmin"
+    class="message-error">
+    {{ error }}
+  </div>
+
+  <ng-container *ngIf="!checkingRole && isAdmin">
+
+    <!-- =====================================
+         CONSOLA TECNICA
+         ===================================== -->
+
+    <section class="technical-console">
+
+      <div class="console-heading">
+        <div>
+          <span class="console-eyebrow">
+            CLOUD NATIVE / EVENT STREAMING
+          </span>
+
+          <h3>Consola de Apache Kafka</h3>
+
+          <p>
+            Información técnica consultada desde
+            Kafka Admin mediante el BFF.
+          </p>
+        </div>
+
+        <div class="console-icon" aria-hidden="true">
+          ◎
+        </div>
+      </div>
+
+      <div class="console-grid">
+
+        <div class="console-metric">
+          <span>Tópicos consultados</span>
+
+          <strong>
+            {{ topicsLoaded ? topics.length : '—' }}
+          </strong>
+
+          <small>Listado de tópicos recibido</small>
+        </div>
+
+        <div class="console-metric">
+          <span>Grupos registrados</span>
+
+          <strong>
+            {{
+              groupsLoaded
+                ? consumerGroups.length
+                : '—'
+            }}
+          </strong>
+
+          <small>No implica consumidores conectados</small>
+        </div>
+
+        <div class="console-metric">
+          <span>Tópicos DLT</span>
+
+          <strong>
+            {{
+              dltLoaded && dltOffsets
+                ? dltOffsets.topicCount
+                : '—'
+            }}
+          </strong>
+
+          <small>Consulta de monitoreo DLT</small>
+        </div>
+
+      </div>
+
+      <p class="console-note">
+        Los datos se actualizan al utilizar los botones
+        de consulta. No representan monitoreo
+        continuo en tiempo real.
+      </p>
+
+    </section>
+
+    <!-- =====================================
+         ESTADISTICAS
+         ===================================== -->
+
+    <div class="stats-grid">
+
+      <article class="stat-card">
+
+        <div class="stat-icon">▦</div>
+
+        <span class="stat-label">
+          Tópicos totales
+        </span>
+
+        <strong class="stat-value">
+          {{ topicsLoaded ? topics.length : '—' }}
+        </strong>
+
+        <span class="stat-description">
+          Registrados en la consulta
+        </span>
+      </article>
+
+      <article class="stat-card">
+
+        <div class="stat-icon">◈</div>
+
+        <span class="stat-label">
+          Tópicos normales
+        </span>
+
+        <strong class="stat-value">
+          {{ topicsLoaded ? normalTopicsCount : '—' }}
+        </strong>
+
+        <span class="stat-description">
+          Tópicos distintos de DLT
+        </span>
+      </article>
+
+      <article class="stat-card">
+
+        <div class="stat-icon dlt-icon">!</div>
+
+        <span class="stat-label">
+          Dead Letter Topics
+        </span>
+
+        <strong class="stat-value">
+          {{ topicsLoaded ? dltTopicsCount : '—' }}
+        </strong>
+
+        <span class="stat-description">
+          Tópicos identificados como DLT
+        </span>
+      </article>
+
+    </div>
+
+    <!-- =====================================
+         EXPLORADOR DE TOPICOS
+         ===================================== -->
+
+    <section class="dashboard-panel">
+
+      <div class="panel-heading">
+        <div>
+          <span class="panel-kicker">
+            EXPLORADOR DE RECURSOS
+          </span>
+
+          <h3>Tópicos de Kafka</h3>
+
+          <p>
+            Busca y consulta la configuración
+            de los tópicos del clúster.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="primary-btn"
+          (click)="loadTopics()"
+          [disabled]="loading || loadingDetails">
+
+          {{
+            loading
+              ? 'Consultando...'
+              : '↻ Actualizar tópicos'
+          }}
+        </button>
+      </div>
+
+      <!-- ERROR -->
+      <div *ngIf="error" class="message-error">
+        {{ error }}
+      </div>
+
+      <!-- BUSCADOR -->
+      <div class="search-box">
+
+        <span class="search-symbol" aria-hidden="true">
+          ⌕
+        </span>
+
+        <input
+          type="search"
+          placeholder="Buscar tópico por nombre..."
+          aria-label="Buscar tópico por nombre"
+          [value]="searchTerm"
+          (input)="updateSearch($any($event.target).value)"
+        />
+      </div>
+
+      <!-- FILTROS -->
+      <div class="filter-row">
+
+        <div class="filter-buttons">
+
+          <button
+            type="button"
+            [class.active]="activeFilter === 'all'"
+            (click)="setFilter('all')">
+            Todos
+          </button>
+
+          <button
+            type="button"
+            [class.active]="activeFilter === 'normal'"
+            (click)="setFilter('normal')">
+            Normales
+          </button>
+
+          <button
+            type="button"
+            [class.active]="activeFilter === 'dlt'"
+            (click)="setFilter('dlt')">
+            DLT
+          </button>
+
+        </div>
+
+        <span class="results-count" *ngIf="topicsLoaded">
+          {{ filteredTopics.length }} resultados
+        </span>
+      </div>
+
+      <!-- ESTADO INICIAL -->
+      <div
+        class="empty-state"
+        *ngIf="!topicsLoaded && !loading && !error">
+
+        <span class="empty-icon">▦</span>
+
+        <strong>Explora los tópicos del clúster</strong>
+
+        <p>
+          Presiona Actualizar tópicos para consultar
+          la información desde el backend.
+        </p>
+      </div>
+
+      <!-- CARGANDO -->
+      <div class="empty-state" *ngIf="loading">
+
+        <span class="loading-spinner"></span>
+
+        <p>Consultando tópicos de Kafka...</p>
+      </div>
+
+      <!-- SIN RESULTADOS -->
+      <div
+        class="empty-state"
+        *ngIf="
+          topicsLoaded &&
+          !loading &&
+          filteredTopics.length === 0
+        ">
+
+        <span class="empty-icon">⌕</span>
+
+        <strong>No se encontraron tópicos</strong>
+
+        <p>
+          Prueba otra búsqueda o cambia el filtro.
+        </p>
+      </div>
+
+      <!-- LISTADO -->
+      <div
+        class="topic-list"
+        *ngIf="!loading && filteredTopics.length > 0">
+
+        <article
+          class="topic-item"
+          *ngFor="
+            let topic of filteredTopics;
+            trackBy: trackTopic
+          "
+          [class.topic-selected]="selectedTopic === topic">
+
+          <div
+            class="topic-icon"
+            [class.topic-icon-dlt]="isDlt(topic)">
+
+            {{ isDlt(topic) ? '!' : '▦' }}
+          </div>
+
+          <div class="topic-info">
+
+            <strong>{{ topic }}</strong>
+
+            <span>
+              {{
+                isDlt(topic)
+                  ? 'Dead Letter Topic'
+                  : 'Tópico de eventos'
+              }}
+            </span>
+          </div>
+
+          <span
+            class="topic-type"
+            [class.topic-type-dlt]="isDlt(topic)">
+
+            {{ isDlt(topic) ? 'DLT' : 'NORMAL' }}
+          </span>
+
+          <button
+            type="button"
+            class="detail-btn"
+            (click)="loadTopicDetails(topic)"
+            [disabled]="loadingDetails">
+
+            Ver detalle
+            <span aria-hidden="true">→</span>
+          </button>
+
+        </article>
+      </div>
+
+    </section>
+
+    <!-- =====================================
+         DETALLE DEL TOPICO
+         ===================================== -->
+
+    <section
+      class="dashboard-panel detail-panel"
+      *ngIf="selectedTopic">
+
+      <div class="panel-heading">
+        <div>
+
+          <span class="panel-kicker">
+            INFORMACIÓN TÉCNICA
+          </span>
+
+          <h3>Detalle del tópico</h3>
+
+          <p class="selected-topic-name">
+            {{ selectedTopic }}
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="close-detail"
+          (click)="closeTopicDetails()">
+
+          Cerrar detalle
+        </button>
+      </div>
+
+      <div
+        class="detail-loading"
+        *ngIf="loadingDetails">
+
+        <span class="loading-spinner"></span>
+
+        Consultando información del tópico...
+      </div>
+
+      <div
+        *ngIf="detailsError"
+        class="message-error">
+
+        {{ detailsError }}
+      </div>
+
+      <ng-container *ngIf="topicDetails as details">
+
+        <div class="detail-stats">
+
+          <div class="detail-stat">
+            <span>Particiones</span>
+            <strong>{{ details.partitionCount }}</strong>
+          </div>
+
+          <div class="detail-stat">
+            <span>Tipo de tópico</span>
+            <strong>
+              {{
+                isDlt(details.name)
+                  ? 'DLT'
+                  : 'Normal'
+              }}
+            </strong>
+          </div>
+
+          <div class="detail-stat">
+            <span>Particiones descritas</span>
+            <strong>{{ details.partitions.length }}</strong>
+          </div>
+
+        </div>
+
+        <div class="table-heading">
+          <h4>Información de particiones</h4>
+
+          <p>
+            Líderes, réplicas e ISR
+            de cada partición.
+          </p>
+        </div>
+
+        <div class="table-wrapper">
+
+          <table class="partition-table">
+
+            <thead>
+              <tr>
+                <th>Partición</th>
+                <th>Líder</th>
+                <th>Réplicas</th>
+                <th>ISR</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              <tr
+                *ngFor="let partition of details.partitions">
+
+                <td>
+                  <strong>#{{ partition.partition }}</strong>
+                </td>
+
+                <td>
+                  <span class="leader-chip">
+                    Broker {{ partition.leader }}
+                  </span>
+                </td>
+
+                <td>
+                  {{ partition.replicas.join(', ') || '—' }}
+                </td>
+
+                <td>
+                  {{ partition.isr.join(', ') || '—' }}
+                </td>
+              </tr>
+
+              <tr *ngIf="details.partitions.length === 0">
+                <td colspan="4" class="no-partitions">
+                  No se encontraron particiones.
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <p class="technical-note">
+          ISR significa In-Sync Replicas.
+          Los datos provienen del servicio Kafka Admin.
+        </p>
+
+      </ng-container>
+
+    </section>
+
+    <!-- =====================================
+         MONITOREO DLT
+         ===================================== -->
+
+    <section class="dashboard-panel dlt-monitor-panel">
+
+      <div class="panel-heading">
+
+        <div>
+          <span class="panel-kicker">
+            MONITOREO DE ERRORES
+          </span>
+
+          <h3>Dead Letter Topics</h3>
+
+          <p>
+            Consulta offsets iniciales y finales
+            de los tópicos DLT.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="primary-btn"
+          (click)="loadDltOffsets()"
+          [disabled]="loadingDlt">
+
+          {{
+            loadingDlt
+              ? 'Consultando...'
+              : '↻ Actualizar monitoreo'
+          }}
+        </button>
+      </div>
+
+      <div *ngIf="dltError" class="message-error">
+        {{ dltError }}
+      </div>
+
+      <div
+        class="empty-state"
+        *ngIf="!dltLoaded && !loadingDlt && !dltError">
+
+        <span class="empty-icon">!</span>
+
+        <strong>Monitoreo DLT disponible</strong>
+
+        <p>
+          Presiona Actualizar monitoreo para
+          consultar los offsets registrados.
+        </p>
+      </div>
+
+      <div class="empty-state" *ngIf="loadingDlt">
+        <span class="loading-spinner"></span>
+        <p>Consultando offsets de tópicos DLT...</p>
+      </div>
+
+      <ng-container
+        *ngIf="dltLoaded && dltOffsets as dlt">
+
+        <div class="detail-stats">
+
+          <div class="detail-stat">
+            <span>Tópicos DLT detectados</span>
+            <strong>{{ dlt.topicCount }}</strong>
+          </div>
+
+          <div class="detail-stat">
+            <span>Amplitud total de offsets</span>
+            <strong>
+              {{ dlt.totalEstimatedRecords | number }}
+            </strong>
+          </div>
+
+          <div class="detail-stat">
+            <span>Métrica utilizada</span>
+            <strong class="metric-name">
+              {{ dlt.metric }}
+            </strong>
+          </div>
+
+        </div>
+
+        <div
+          class="empty-state"
+          *ngIf="dlt.topics.length === 0">
+
+          <strong>No se encontraron tópicos DLT</strong>
+
+          <p>
+            Kafka no devolvió tópicos DLT
+            en esta consulta.
+          </p>
+        </div>
+
+        <div
+          class="topic-list"
+          *ngIf="dlt.topics.length > 0">
+
+          <article
+            class="topic-item"
+            *ngFor="
+              let topic of dlt.topics;
+              trackBy: trackDltTopic
+            ">
+
+            <div class="topic-icon topic-icon-dlt">
+              !
+            </div>
+
+            <div class="topic-info">
+
+              <strong>{{ topic.name }}</strong>
+
+              <span>
+                {{ topic.partitionCount }} partición(es)
+                · amplitud de offsets:
+                {{ topic.estimatedRecords | number }}
+              </span>
+            </div>
+
+            <span class="topic-type topic-type-dlt">
+              DLT
+            </span>
+          </article>
+        </div>
+
+        <ng-container
+          *ngFor="
+            let topic of dlt.topics;
+            trackBy: trackDltTopic
+          ">
+
+          <div class="table-heading dlt-table-heading">
+
+            <h4>{{ topic.name }}</h4>
+
+            <p>
+              Offsets iniciales y finales por partición.
+            </p>
+          </div>
+
+          <div class="table-wrapper">
+
+            <table class="partition-table">
+
+              <thead>
+                <tr>
+                  <th>Partición</th>
+                  <th>Offset inicial</th>
+                  <th>Offset final</th>
+                  <th>Amplitud</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                <tr
+                  *ngFor="
+                    let partition of topic.partitions;
+                    trackBy: trackDltPartition
+                  ">
+
+                  <td>
+                    <strong>
+                      #{{ partition.partition }}
+                    </strong>
+                  </td>
+
+                  <td>
+                    {{ partition.beginningOffset | number }}
+                  </td>
+
+                  <td>
+                    {{ partition.endOffset | number }}
+                  </td>
+
+                  <td>
+                    <strong>
+                      {{ partition.estimatedRecords | number }}
+                    </strong>
+                  </td>
+                </tr>
+
+                <tr *ngIf="topic.partitions.length === 0">
+                  <td colspan="4" class="no-partitions">
+                    No se encontraron particiones.
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+        </ng-container>
+
+        <p class="technical-note">
+          La métrica offset-span corresponde a la
+          diferencia entre el offset final y el inicial
+          de cada partición. No es un conteo exacto de
+          mensajes, ni indica por sí sola cuántos
+          mensajes están pendientes de reprocesamiento.
+        </p>
+
+      </ng-container>
+
+    </section>
+
+    <!-- =====================================
+         CONSUMIDORES
+         ===================================== -->
+
+    <section class="dashboard-panel consumer-panel">
+
+      <div class="panel-heading">
+
+        <div>
+          <span class="panel-kicker">
+            CONSUMIDORES
+          </span>
+
+          <h3>Grupos de consumidores</h3>
+
+          <p>
+            Consulta los grupos registrados en
+            el clúster de Apache Kafka.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="primary-btn"
+          (click)="loadConsumerGroups()"
+          [disabled]="loadingGroups">
+
+          {{
+            loadingGroups
+              ? 'Consultando...'
+              : '↻ Actualizar grupos'
+          }}
+        </button>
+      </div>
+
+      <div
+        *ngIf="groupsError"
+        class="message-error">
+
+        {{ groupsError }}
+      </div>
+
+      <div
+        class="empty-state"
+        *ngIf="
+          !groupsLoaded &&
+          !loadingGroups &&
+          !groupsError
+        ">
+
+        <span class="empty-icon">◎</span>
+
+        <strong>Explora los consumidores</strong>
+
+        <p>
+          Presiona Actualizar grupos para consultar
+          la información de Kafka.
+        </p>
+      </div>
+
+      <div class="empty-state" *ngIf="loadingGroups">
+
+        <span class="loading-spinner"></span>
+
+        <p>Consultando grupos de consumidores...</p>
+      </div>
+
+      <div
+        class="empty-state"
+        *ngIf="
+          groupsLoaded &&
+          !loadingGroups &&
+          consumerGroups.length === 0
+        ">
+
+        <strong>No se encontraron grupos</strong>
+
+        <p>
+          Kafka no devolvió grupos de consumidores.
+        </p>
+      </div>
+
+      <div
+        class="consumer-summary"
+        *ngIf="
+          groupsLoaded &&
+          !loadingGroups &&
+          consumerGroups.length > 0
+        ">
+
+        <div class="consumer-stat">
+          <span>Grupos registrados</span>
+          <strong>{{ consumerGroups.length }}</strong>
+        </div>
+
+        <div class="consumer-stat">
+          <span>Origen de información</span>
+          <strong>Apache Kafka</strong>
+        </div>
+      </div>
+
+      <div
+        class="consumer-list"
+        *ngIf="
+          groupsLoaded &&
+          !loadingGroups &&
+          consumerGroups.length > 0
+        ">
+
+        <article
+          class="consumer-item"
+          *ngFor="
+            let group of consumerGroups;
+            trackBy: trackGroup
+          ">
+
+          <div class="consumer-icon">
+            ◎
+          </div>
+
+          <div class="consumer-info">
+
+            <strong>{{ group }}</strong>
+
+            <p>
+              {{ getConsumerGroupDescription(group) }}
+            </p>
+          </div>
+
+          <span class="consumer-label">
+            CONSUMIDOR
+          </span>
+        </article>
+      </div>
+
+      <p
+        class="technical-note"
+        *ngIf="groupsLoaded && !groupsError">
+
+        Esta consulta muestra grupos registrados.
+        No confirma que sus consumidores estén
+        conectados actualmente.
+      </p>
+
+    </section>
+
+  </ng-container>
+
+</section>

@@ -1,513 +1,894 @@
 
-<section class="card">
+<section class="bookings-page">
 
-  <!-- ENCABEZADO -->
-  <div class="page-header">
+  <!-- ======================================
+       ENCABEZADO
+       ====================================== -->
+
+  <header class="page-header">
+
     <div>
-      <span class="eyebrow">Gestión académica</span>
+      <span class="eyebrow">
+        CAMPUSLAB / GESTIÓN ACADÉMICA
+      </span>
 
       <h2>
-        {{ isStudentOnly ? 'Mis reservas' : 'Reservas de laboratorios' }}
+        {{
+          isStudentOnly
+            ? 'Mis reservas'
+            : 'Gestión de reservas'
+        }}
       </h2>
 
-      <p *ngIf="isStudentOnly">
-        Solicita laboratorios y equipos académicos,
-        y consulta el estado de tus reservas.
-      </p>
-
-      <p *ngIf="!isStudentOnly">
-        Consulta y administra las solicitudes de reserva
-        de laboratorios y equipos académicos.
-      </p>
-    </div>
-
-    <button
-      class="primary-button"
-      type="button"
-      (click)="loadBookings()"
-      [disabled]="loading || !rolesLoaded">
-
-      {{ loading ? 'Actualizando...' : 'Actualizar reservas' }}
-
-    </button>
-  </div>
-
-  <!-- INFORMACIÓN DE SEGURIDAD -->
-  <div class="info-banner">
-    <div>
-      <strong>Conexión protegida con Microsoft</strong>
-
       <p>
-        CampusLab utiliza MSAL, JWT, API Gateway
-        y BFF para comunicarse con los microservicios.
+        {{
+          isStudentOnly
+            ? 'Consulta y administra tus solicitudes de laboratorios y equipos.'
+            : 'Supervisa las solicitudes y el estado de las reservas académicas.'
+        }}
       </p>
     </div>
-  </div>
 
-  <!-- VERIFICACIÓN DE ROLES -->
-  <p *ngIf="!rolesLoaded" class="loading">
+    <div class="header-actions">
+
+      <span class="role-badge">
+        <span class="role-dot"></span>
+        {{ primaryRole }}
+      </span>
+
+      <button
+        type="button"
+        class="primary-button"
+        (click)="loadBookings()"
+        [disabled]="
+          loading ||
+          !rolesLoaded ||
+          (!canManageBookings && !isStudentOnly)
+        ">
+
+        <span aria-hidden="true">↻</span>
+
+        {{
+          loading
+            ? 'Actualizando...'
+            : 'Actualizar reservas'
+        }}
+
+      </button>
+
+    </div>
+
+  </header>
+
+  <!-- ======================================
+       MENSAJES
+       ====================================== -->
+
+  <div
+    *ngIf="!rolesLoaded"
+    class="loading">
+
     Verificando permisos de Microsoft...
-  </p>
+  </div>
 
-  <p *ngIf="roleError" class="error-message">
+  <div
+    *ngIf="roleError"
+    class="error-message">
+
     {{ roleError }}
-  </p>
-
-  <!-- INFORMACIÓN SEGÚN ROL -->
-  <div
-    *ngIf="rolesLoaded && isStudentOnly"
-    class="info-banner">
-
-    <div>
-      <strong>Panel de estudiante</strong>
-
-      <p>
-        Puedes solicitar laboratorios y consultar
-        el estado de tus propias reservas.
-        Las aprobaciones y devoluciones
-        corresponden al personal autorizado.
-      </p>
-    </div>
   </div>
 
   <div
-    *ngIf="rolesLoaded && canManageBookings"
-    class="info-banner">
+    *ngIf="success"
+    class="success-message"
+    role="status">
 
-    <div>
-      <strong>Panel de gestión de reservas</strong>
-
-      <p>
-        Puedes revisar las solicitudes y realizar
-        los cambios de estado permitidos
-        durante el proceso de reserva.
-      </p>
-    </div>
-  </div>
-
-  <!-- MENSAJES -->
-  <p *ngIf="success" class="success-message">
+    <span aria-hidden="true">✓</span>
     {{ success }}
-  </p>
 
-  <p *ngIf="error" class="error-message">
+  </div>
+
+  <div
+    *ngIf="error"
+    class="error-message"
+    role="alert">
+
     {{ error }}
-  </p>
+  </div>
 
-  <!-- FORMULARIO Y RESUMEN -->
-  <div class="grid" *ngIf="rolesLoaded && userRoles.length > 0">
+  <ng-container
+    *ngIf="
+      rolesLoaded &&
+      (canManageBookings || isStudentOnly)
+    ">
 
-    <!-- NUEVA RESERVA -->
-    <section
-      class="form-card"
-      *ngIf="canCreateBooking">
+    <!-- ======================================
+         INDICADORES DE RESERVAS
+         ====================================== -->
 
-      <h3>Nueva reserva</h3>
+    <div class="stats-grid">
 
-      <form (ngSubmit)="createBooking()">
+      <article class="stat-card">
 
-        <label>
-          Correo estudiante
+        <div class="stat-top">
 
-          <input
-            type="email"
-            name="userEmail"
-            [(ngModel)]="newBooking.userEmail"
-            [readonly]="isStudentOnly"
-            placeholder="estudiante@duocuc.cl"
-            required
-          />
+          <span class="stat-icon stat-blue">
+            ▤
+          </span>
+
+          <span class="stat-indicator">
+            TOTAL
+          </span>
+
+        </div>
+
+        <span class="stat-label">
+          {{
+            isStudentOnly
+              ? 'Mis reservas'
+              : 'Reservas totales'
+          }}
+        </span>
+
+        <strong class="stat-value">
+          {{ totalBookings }}
+        </strong>
+
+        <p>Registros disponibles</p>
+
+      </article>
+
+      <article class="stat-card">
+
+        <div class="stat-top">
+
+          <span class="stat-icon stat-orange">
+            ◷
+          </span>
+
+          <span class="stat-indicator">
+            PENDIENTES
+          </span>
+
+        </div>
+
+        <span class="stat-label">
+          Solicitadas
+        </span>
+
+        <strong class="stat-value">
+          {{ requestedBookings }}
+        </strong>
+
+        <p>Esperando aprobación</p>
+
+      </article>
+
+      <article class="stat-card">
+
+        <div class="stat-top">
+
+          <span class="stat-icon stat-purple">
+            ◈
+          </span>
+
+          <span class="stat-indicator">
+            PREPARACIÓN
+          </span>
+
+        </div>
+
+        <span class="stat-label">
+          En preparación
+        </span>
+
+        <strong class="stat-value">
+          {{ preparingBookings }}
+        </strong>
+
+        <p>Preparación registrada</p>
+
+      </article>
+
+      <article class="stat-card">
+
+        <div class="stat-top">
+
+          <span class="stat-icon stat-cyan">
+            ◉
+          </span>
+
+          <span class="stat-indicator">
+            ACTIVAS
+          </span>
+
+        </div>
+
+        <span class="stat-label">
+          En uso
+        </span>
+
+        <strong class="stat-value">
+          {{ inUseBookings }}
+        </strong>
+
+        <p>Reservas marcadas en uso</p>
+
+      </article>
+
+    </div>
+
+    <!-- ======================================
+         FORMULARIO Y PANEL DE INFORMACION
+         ====================================== -->
+
+    <div class="workspace-grid">
+
+      <!-- FORMULARIO -->
+      <section
+        class="form-card"
+        *ngIf="canCreateBooking">
+
+        <div class="card-heading">
+
+          <div>
+            <span class="section-kicker">
+              NUEVA SOLICITUD
+            </span>
+
+            <h3>Crear reserva</h3>
+
+            <p>
+              Completa los datos para registrar
+              una nueva solicitud académica.
+            </p>
+          </div>
+
+          <span class="card-icon">
+            +
+          </span>
+
+        </div>
+
+        <form (ngSubmit)="createBooking()">
+
+          <div class="form-fields">
+
+            <label>
+
+              <span>Correo del estudiante</span>
+
+              <input
+                type="email"
+                name="userEmail"
+                [(ngModel)]="newBooking.userEmail"
+                [readonly]="isStudentOnly"
+                placeholder="estudiante@duocuc.cl"
+                required
+              />
+
+              <small *ngIf="isStudentOnly">
+                Se utiliza tu cuenta institucional.
+              </small>
+
+            </label>
+
+            <label>
+
+              <span>Laboratorio o recurso</span>
+
+              <input
+                type="text"
+                name="resourceId"
+                [(ngModel)]="newBooking.resourceId"
+                placeholder="Ej.: LAB-REDES-01"
+                required
+              />
+
+              <small>
+                Ingresa el identificador del recurso.
+              </small>
+
+            </label>
+
+          </div>
+
+          <div class="form-footer">
+
+            <div class="request-hint">
+              <span aria-hidden="true">◎</span>
+              La nueva reserva se registrará
+              en estado SOLICITADA.
+            </div>
+
+            <button
+              class="primary-button"
+              type="submit"
+              [disabled]="
+                saving ||
+                !newBooking.userEmail.trim() ||
+                !newBooking.resourceId.trim()
+              ">
+
+              {{
+                saving
+                  ? 'Creando reserva...'
+                  : '+ Crear reserva'
+              }}
+
+            </button>
+
+          </div>
+
+        </form>
+
+      </section>
+
+      <!-- INFORMACION DE GESTION -->
+      <section class="summary-card">
+
+        <div class="card-heading">
+
+          <div>
+            <span class="section-kicker">
+              SEGUIMIENTO ACADÉMICO
+            </span>
+
+            <h3>Estado de las solicitudes</h3>
+
+            <p>
+              Resumen de las etapas de gestión
+              disponibles en CampusLab.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="status-overview">
+
+          <div class="overview-row">
+
+            <span class="overview-dot dot-requested"></span>
+
+            <div>
+              <strong>Solicitadas</strong>
+              <small>Esperando revisión</small>
+            </div>
+
+            <span class="overview-count">
+              {{ requestedBookings }}
+            </span>
+
+          </div>
+
+          <div class="overview-row">
+
+            <span class="overview-dot dot-approved"></span>
+
+            <div>
+              <strong>Aprobadas</strong>
+              <small>Solicitud autorizada</small>
+            </div>
+
+            <span class="overview-count">
+              {{ approvedBookings }}
+            </span>
+
+          </div>
+
+          <div class="overview-row">
+
+            <span class="overview-dot dot-preparing"></span>
+
+            <div>
+              <strong>En preparación</strong>
+              <small>Preparación del recurso</small>
+            </div>
+
+            <span class="overview-count">
+              {{ preparingBookings }}
+            </span>
+
+          </div>
+
+          <div class="overview-row">
+
+            <span class="overview-dot dot-in-use"></span>
+
+            <div>
+              <strong>En uso</strong>
+              <small>Uso registrado</small>
+            </div>
+
+            <span class="overview-count">
+              {{ inUseBookings }}
+            </span>
+
+          </div>
+
+        </div>
+
+        <div class="summary-note">
+
+          <span aria-hidden="true">◇</span>
+
+          <p>
+            Los cambios de estado y las operaciones
+            disponibles dependen de tu rol.
+          </p>
+
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- ======================================
+         LISTADO Y FILTROS
+         ====================================== -->
+
+    <section class="table-section">
+
+      <div class="table-header">
+
+        <div>
+          <span class="section-kicker">
+            CONTROL DE RESERVAS
+          </span>
+
+          <h3>
+            {{
+              isStudentOnly
+                ? 'Mis solicitudes'
+                : 'Listado de reservas'
+            }}
+          </h3>
+
+          <p>
+            Busca, filtra y consulta los registros
+            disponibles para tu cuenta.
+          </p>
+        </div>
+
+        <span class="results-badge">
+          {{ filteredBookings.length }}
+          resultado(s)
+        </span>
+
+      </div>
+
+      <!-- FILTROS -->
+      <div class="filters-bar">
+
+        <label class="search-field">
+
+          <span class="filter-label">
+            Buscar reserva
+          </span>
+
+          <span class="search-input-wrapper">
+
+            <span class="search-icon" aria-hidden="true">
+              ⌕
+            </span>
+
+            <input
+              type="search"
+              name="searchTerm"
+              [(ngModel)]="searchTerm"
+              placeholder="ID, estudiante o laboratorio..."
+            />
+
+          </span>
+
         </label>
 
-        <label>
-          Recurso / laboratorio
+        <label class="filter-field">
 
-          <input
-            type="text"
-            name="resourceId"
-            [(ngModel)]="newBooking.resourceId"
-            placeholder="LAB-REDES-01"
-            required
-          />
+          <span class="filter-label">
+            Filtrar por estado
+          </span>
+
+          <select
+            name="selectedStatus"
+            [(ngModel)]="selectedStatus">
+
+            <option
+              *ngFor="let option of statusOptions"
+              [value]="option.value">
+
+              {{ option.label }}
+
+            </option>
+
+          </select>
+
         </label>
 
         <button
-          class="primary-button full-button"
-          type="submit"
-          [disabled]="
-            saving ||
-            !canCreateBooking ||
-            !newBooking.userEmail.trim() ||
-            !newBooking.resourceId.trim()
-          ">
+          type="button"
+          class="clear-button"
+          (click)="clearFilters()"
+          [disabled]="!hasActiveFilters">
 
-          {{ saving ? 'Creando reserva...' : 'Crear reserva' }}
+          Limpiar filtros
 
         </button>
 
-      </form>
-    </section>
-
-    <!-- RESUMEN -->
-    <section class="summary-card">
-
-      <h3>Resumen</h3>
-
-      <div class="metric">
-        <span>
-          {{ isStudentOnly ? 'Mis reservas' : 'Total reservas' }}
-        </span>
-
-        <strong>{{ visibleBookings.length }}</strong>
       </div>
 
-      <div class="metric">
-        <span>Estado del servicio</span>
+      <div
+        *ngIf="loading"
+        class="table-loading">
 
-        <strong>
-          {{
-            loading
-              ? 'Consultando...'
-              : (error ? 'Error' : 'Sin errores detectados')
-          }}
-        </strong>
+        <span class="loading-spinner"></span>
+        Consultando reservas...
       </div>
 
-      <div class="metric">
-        <span>Seguridad</span>
-        <strong>JWT</strong>
+      <!-- TABLA CON DESPLAZAMIENTO HORIZONTAL -->
+      <div
+        class="table-scroll"
+        *ngIf="filteredBookings.length > 0">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>Reserva</th>
+              <th>Estudiante</th>
+              <th>Laboratorio</th>
+              <th>Estado</th>
+              <th>Flujo asociado</th>
+
+              <th *ngIf="canManageBookings">
+                Acciones
+              </th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            <tr
+              *ngFor="
+                let booking of filteredBookings;
+                trackBy: trackBooking
+              ">
+
+              <td>
+
+                <div class="booking-id">
+                  <span class="booking-id-icon">
+                    ▤
+                  </span>
+
+                  <strong>
+                    #{{ booking.id }}
+                  </strong>
+                </div>
+
+              </td>
+
+              <td>
+
+                <span class="student-email">
+                  {{ booking.userEmail }}
+                </span>
+
+              </td>
+
+              <td>
+
+                <span class="resource-label">
+                  {{ booking.resourceId }}
+                </span>
+
+              </td>
+
+              <td>
+
+                <span
+                  class="status-pill"
+                  [ngClass]="getStatusClass(booking.status)">
+
+                  <span class="status-dot"></span>
+
+                  {{ formatStatus(booking.status) }}
+
+                </span>
+
+              </td>
+
+              <td>
+
+                <span
+                  class="async-process"
+                  [ngSwitch]="booking.status">
+
+                  <span *ngSwitchCase="'SOLICITADA'">
+                    EmailConsumer
+                  </span>
+
+                  <span *ngSwitchCase="'APROBADA'">
+                    Email + Prep
+                  </span>
+
+                  <span *ngSwitchCase="'DEVUELTA'">
+                    Email + Voucher
+                  </span>
+
+                  <span *ngSwitchCase="'EN_PREPARACION'">
+                    Preparación
+                  </span>
+
+                  <span *ngSwitchCase="'EN_USO'">
+                    En uso
+                  </span>
+
+                  <span *ngSwitchCase="'CANCELADA'">
+                    Cancelación
+                  </span>
+
+                  <span *ngSwitchDefault>
+                    Estado registrado
+                  </span>
+
+                </span>
+
+              </td>
+
+              <td *ngIf="canManageBookings">
+
+                <div class="booking-actions">
+
+                  <button
+                    *ngFor="
+                      let nextStatus of
+                        getAvailableStatuses(booking.status)
+                    "
+                    type="button"
+                    class="action-button"
+                    [class.action-cancel]="
+                      nextStatus === 'CANCELADA'
+                    "
+                    [disabled]="
+                      updatingId !== null ||
+                      booking.id == null
+                    "
+                    (click)="changeStatus(
+                      booking,
+                      nextStatus
+                    )">
+
+                    {{
+                      updatingId === booking.id
+                        ? 'Actualizando...'
+                        : getActionLabel(nextStatus)
+                    }}
+
+                  </button>
+
+                  <span
+                    *ngIf="
+                      getAvailableStatuses(booking.status)
+                        .length === 0
+                    "
+                    class="no-actions">
+
+                    Sin acciones disponibles
+
+                  </span>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
       </div>
 
-      <div class="metric">
-        <span>Mensajería</span>
-        <strong>RabbitMQ</strong>
-      </div>
+      <!-- SIN RESERVAS -->
+      <div
+        *ngIf="
+          !loading &&
+          !error &&
+          visibleBookings.length === 0
+        "
+        class="empty-state">
 
-      <div class="metric">
-        <span>Rol actual</span>
-        <strong>{{ userRoles.join(', ') }}</strong>
-      </div>
-
-    </section>
-
-  </div>
-
-  <!-- FLUJO ASÍNCRONO RABBITMQ -->
-  <section
-    class="ep3-booking-flow"
-    *ngIf="rolesLoaded && userRoles.length > 0">
-
-    <div class="ep3-booking-header">
-
-      <span class="ep3-booking-badge">EP3</span>
-
-      <h3>Flujo asíncrono de reservas</h3>
-
-      <p>
-        Los eventos de reservas son publicados por
-        <strong>ms-bookings</strong> y procesados por
-        <strong>ms-notify</strong> mediante RabbitMQ.
-      </p>
-
-    </div>
-
-    <div class="booking-flow-grid">
-
-      <!-- SOLICITADA -->
-      <article class="booking-flow-card">
-
-        <div class="booking-state requested">
-          SOLICITADA
-        </div>
-
-        <h4>Reserva creada</h4>
-
-        <p>Se publica el evento:</p>
-
-        <code>BOOKING_CREATED</code>
-
-        <div class="booking-route">
-          <span>ms-bookings</span>
-          <span>→</span>
-          <span>RabbitMQ</span>
-          <span>→</span>
-          <span>q.cmd.email</span>
-          <span>→</span>
-          <span>EmailConsumer</span>
-        </div>
-
-      </article>
-
-      <!-- APROBADA -->
-      <article class="booking-flow-card">
-
-        <div class="booking-state approved">
-          APROBADA
-        </div>
-
-        <h4>Reserva aprobada</h4>
-
-        <p>Se publica el evento:</p>
-
-        <code>BOOKING_STATUS_CHANGED</code>
-
-        <div class="booking-route">
-          <span>RabbitMQ</span>
-          <span>→</span>
-          <span>EmailConsumer</span>
-        </div>
-
-        <div class="booking-route secondary-route">
-          <span>RabbitMQ</span>
-          <span>→</span>
-          <span>q.cmd.prep</span>
-          <span>→</span>
-          <span>PrepConsumer</span>
-        </div>
-
-      </article>
-
-      <!-- DEVUELTA -->
-      <article class="booking-flow-card">
-
-        <div class="booking-state returned">
-          DEVUELTA
-        </div>
-
-        <h4>Reserva devuelta</h4>
-
-        <p>Se publica el evento:</p>
-
-        <code>BOOKING_STATUS_CHANGED</code>
-
-        <div class="booking-route">
-          <span>RabbitMQ</span>
-          <span>→</span>
-          <span>EmailConsumer</span>
-        </div>
-
-        <div class="booking-route secondary-route">
-          <span>RabbitMQ</span>
-          <span>→</span>
-          <span>q.cmd.voucher</span>
-          <span>→</span>
-          <span>VoucherConsumer</span>
-        </div>
-
-      </article>
-
-    </div>
-
-    <!-- MANEJO DE ERRORES -->
-    <div class="dlq-info">
-
-      <strong>Manejo de errores</strong>
-
-      <p>
-        Si un consumer rechaza un mensaje con
-        <code>NACK</code> sin requeue, RabbitMQ puede
-        redirigirlo a su Dead Letter Queue.
-      </p>
-
-    </div>
-
-  </section>
-
-  <!-- LISTADO DE RESERVAS -->
-  <section
-    class="table-section"
-    *ngIf="rolesLoaded && userRoles.length > 0">
-
-    <div class="table-header">
-
-      <div>
+        <span class="empty-icon">▤</span>
 
         <h3>
-          {{ isStudentOnly ? 'Mis reservas' : 'Listado de reservas' }}
+          {{
+            isStudentOnly
+              ? 'Todavía no tienes reservas'
+              : 'No hay reservas registradas'
+          }}
         </h3>
 
-        <p *ngIf="isStudentOnly">
-          Consulta el estado de las reservas
-          asociadas a tu correo institucional.
-        </p>
-
-        <p *ngIf="canManageBookings">
-          Consulta y administra las reservas
-          directamente desde CampusLab.
+        <p>
+          {{
+            isStudentOnly
+              ? 'Crea una solicitud para comenzar.'
+              : 'Las reservas aparecerán cuando se registren en CampusLab.'
+          }}
         </p>
 
       </div>
 
-    </div>
+      <!-- FILTROS SIN RESULTADOS -->
+      <div
+        *ngIf="
+          !loading &&
+          visibleBookings.length > 0 &&
+          filteredBookings.length === 0
+        "
+        class="empty-state">
 
-    <!-- CARGA -->
-    <p
-      *ngIf="loading && visibleBookings.length === 0"
-      class="loading">
+        <span class="empty-icon">⌕</span>
 
-      Cargando reservas...
+        <h3>No hay coincidencias</h3>
 
-    </p>
+        <p>
+          Prueba con otro término o cambia
+          el filtro de estado.
+        </p>
 
-    <!-- TABLA -->
-    <table *ngIf="visibleBookings.length > 0">
+        <button
+          type="button"
+          class="clear-button"
+          (click)="clearFilters()">
 
-      <thead>
-        <tr>
+          Mostrar todas las reservas
 
-          <th>ID</th>
-          <th>Estudiante</th>
-          <th>Recurso</th>
-          <th>Estado</th>
-          <th>Procesamiento EP3</th>
+        </button>
 
-          <th *ngIf="canManageBookings">
-            Acciones
-          </th>
+      </div>
 
-        </tr>
-      </thead>
+      <p class="table-footnote">
+        El procesamiento indicado corresponde al flujo
+        asociado a cada estado; no confirma por sí solo
+        que se haya entregado un correo o voucher.
+      </p>
 
-      <tbody>
+    </section>
 
-        <tr *ngFor="let booking of visibleBookings">
+    <!-- ======================================
+         FLUJO TECNICO RABBITMQ
+         ====================================== -->
 
-          <!-- ID -->
-          <td>
-            #{{ booking.id }}
-          </td>
+    <details class="ep3-booking-flow">
 
-          <!-- ESTUDIANTE -->
-          <td>
-            {{ booking.userEmail }}
-          </td>
+      <summary class="ep3-booking-header">
 
-          <!-- RECURSO -->
-          <td>
-            {{ booking.resourceId }}
-          </td>
+        <div>
 
-          <!-- ESTADO -->
-          <td>
-            <span class="status-pill">
-              {{ formatStatus(booking.status) }}
+          <span class="ep3-booking-badge">
+            CLOUD NATIVE / EP3
+          </span>
+
+          <h3>Flujo asíncrono de reservas</h3>
+
+          <p>
+            Arquitectura de mensajería entre
+            ms-bookings, RabbitMQ y ms-notify.
+          </p>
+
+        </div>
+
+        <span class="expand-label">
+          Ver arquitectura
+        </span>
+
+      </summary>
+
+      <div class="ep3-booking-content">
+
+        <div class="booking-flow-grid">
+
+          <article class="booking-flow-card">
+
+            <span class="booking-state requested">
+              SOLICITADA
             </span>
-          </td>
 
-          <!-- PROCESAMIENTO RABBITMQ -->
-          <td>
+            <h4>Reserva creada</h4>
 
-            <div
-              class="async-process"
-              [ngSwitch]="booking.status">
+            <p>Evento:</p>
 
-              <span *ngSwitchCase="'SOLICITADA'">
-                EmailConsumer
-              </span>
+            <code>BOOKING_CREATED</code>
 
-              <span *ngSwitchCase="'APROBADA'">
-                EmailConsumer + PrepConsumer
-              </span>
-
-              <span *ngSwitchCase="'DEVUELTA'">
-                EmailConsumer + VoucherConsumer
-              </span>
-
-              <span *ngSwitchCase="'EN_PREPARACION'">
-                Flujo de preparación
-              </span>
-
-              <span *ngSwitchCase="'EN_USO'">
-                Reserva en uso
-              </span>
-
-              <span *ngSwitchCase="'CANCELADA'">
-                Reserva cancelada
-              </span>
-
-              <span *ngSwitchDefault>
-                Estado registrado
-              </span>
-
+            <div class="booking-route">
+              <span>ms-bookings</span>
+              <span>→</span>
+              <span>RabbitMQ</span>
+              <span>→</span>
+              <span>q.cmd.email</span>
+              <span>→</span>
+              <span>EmailConsumer</span>
             </div>
 
-          </td>
+          </article>
 
-          <!-- ACCIONES SOLO PARA TÉCNICO / ADMIN -->
-          <td *ngIf="canManageBookings">
+          <article class="booking-flow-card">
 
-            <div class="booking-actions">
+            <span class="booking-state approved">
+              APROBADA
+            </span>
 
-              <button
-                *ngFor="
-                  let nextStatus of
-                  getAvailableStatuses(booking.status)
-                "
-                type="button"
-                class="action-button"
-                [disabled]="
-                  updatingId !== null ||
-                  booking.id == null
-                "
-                (click)="changeStatus(booking, nextStatus)">
+            <h4>Reserva aprobada</h4>
 
-                {{
-                  updatingId === booking.id
-                    ? 'Actualizando...'
-                    : formatStatus(nextStatus)
-                }}
+            <p>Evento:</p>
 
-              </button>
+            <code>BOOKING_STATUS_CHANGED</code>
 
-              <span
-                *ngIf="
-                  getAvailableStatuses(booking.status).length === 0
-                "
-                class="no-actions">
-
-                Sin acciones disponibles
-
-              </span>
-
+            <div class="booking-route">
+              <span>RabbitMQ</span>
+              <span>→</span>
+              <span>EmailConsumer</span>
             </div>
 
-          </td>
+            <div class="booking-route secondary-route">
+              <span>RabbitMQ</span>
+              <span>→</span>
+              <span>q.cmd.prep</span>
+              <span>→</span>
+              <span>PrepConsumer</span>
+            </div>
 
-        </tr>
+          </article>
 
-      </tbody>
+          <article class="booking-flow-card">
 
-    </table>
+            <span class="booking-state returned">
+              DEVUELTA
+            </span>
 
-    <!-- SIN RESERVAS -->
-    <div
-      *ngIf="
-        !loading &&
-        !error &&
-        visibleBookings.length === 0
-      "
-      class="empty-state">
+            <h4>Reserva devuelta</h4>
 
-      <h3>
-        {{
-          isStudentOnly
-            ? 'Todavía no tienes reservas'
-            : 'No hay reservas registradas'
-        }}
-      </h3>
+            <p>Evento:</p>
 
-      <p *ngIf="isStudentOnly">
-        Crea una nueva solicitud para verla
-        en este panel.
-      </p>
+            <code>BOOKING_STATUS_CHANGED</code>
 
-      <p *ngIf="canManageBookings">
-        Las reservas aparecerán aquí
-        cuando se registren en CampusLab.
-      </p>
+            <div class="booking-route">
+              <span>RabbitMQ</span>
+              <span>→</span>
+              <span>EmailConsumer</span>
+            </div>
 
-    </div>
+            <div class="booking-route secondary-route">
+              <span>RabbitMQ</span>
+              <span>→</span>
+              <span>q.cmd.voucher</span>
+              <span>→</span>
+              <span>VoucherConsumer</span>
+            </div>
 
-  </section>
+          </article>
+
+        </div>
+
+        <div class="dlq-info">
+
+          <strong>Gestión de errores y DLQ</strong>
+
+          <p>
+            Si un consumer rechaza un mensaje con
+            NACK sin requeue, la configuración de
+            RabbitMQ puede enviarlo a una Dead Letter Queue.
+          </p>
+
+        </div>
+
+      </div>
+
+    </details>
+
+  </ng-container>
 
 </section>
