@@ -1,80 +1,322 @@
 
 <main class="layout">
 
+  <!-- ==========================================
+       BARRA SUPERIOR
+       ========================================== -->
+
   <header class="topbar">
 
-    <!-- LOGO Y NOMBRE -->
-    <div class="brand">
-      <div class="brand-icon">CL</div>
+    <div class="topbar-left">
 
-      <div>
-        <h1>CampusLab</h1>
-        <p>Reserva de laboratorios y equipos académicos</p>
-      </div>
-    </div>
-
-    <!-- MENÚ SEGÚN ROL -->
-    <nav class="nav" *ngIf="initialized && isLoggedIn()">
-
-      <!-- Dashboard para usuarios autenticados -->
-      <a
-        routerLink="/dashboard"
-        routerLinkActive="active">
-        Dashboard
-      </a>
-
-      <!-- ESTUDIANTE -->
-      <a
-        *ngIf="hasRole('ESTUDIANTE')"
-        routerLink="/bookings"
-        routerLinkActive="active">
-        Mis reservas
-      </a>
-
-      <!-- TÉCNICO Y ADMIN -->
-      <a
-        *ngIf="hasAnyRole(['TECNICO', 'ADMIN'])"
-        routerLink="/bookings"
-        routerLinkActive="active">
-        Gestión de reservas
-      </a>
-
-      <!-- ADMINISTRADOR -->
-      <a
-        *ngIf="hasRole('ADMIN')"
-        routerLink="/rabbit-admin"
-        routerLinkActive="active">
-        RabbitMQ Admin
-      </a>
-
-      <!-- AUDITOR -->
-      <a
-        *ngIf="hasAnyRole(['AUDITOR', 'ADMIN'])"
-        routerLink="/audit"
-        routerLinkActive="active">
-        Auditoría
-      </a>
-
-      <!-- USUARIO -->
-      <span
-        *ngIf="userRoles.length > 0"
-        class="user-role">
-        {{ userRoles.join(', ') }}
-      </span>
-
-      <!-- CERRAR SESIÓN -->
       <button
+        *ngIf="initialized && isLoggedIn()"
         type="button"
-        (click)="logout()">
-        Cerrar sesión
+        class="mobile-menu-toggle"
+        (click)="toggleMobileMenu()"
+        [attr.aria-expanded]="mobileMenuOpen"
+        aria-label="Abrir o cerrar navegación">
+        ☰
       </button>
 
-    </nav>
+      <a
+        class="brand"
+        routerLink="/dashboard"
+        (click)="closeMobileMenu(); closeProfileMenu()">
+
+        <div class="brand-icon">
+          CL
+        </div>
+
+        <div class="brand-text">
+          <h1>CampusLab</h1>
+          <p>Plataforma de gestión académica</p>
+        </div>
+
+      </a>
+
+    </div>
+
+    <div
+      class="topbar-actions"
+      *ngIf="initialized && isLoggedIn()">
+
+      <span class="session-indicator">
+        <span class="session-dot"></span>
+        Sesión activa
+      </span>
+
+      <!-- PERFIL MICROSOFT -->
+      <div class="profile-container">
+
+        <button
+          type="button"
+          class="profile-trigger"
+          (click)="toggleProfileMenu()"
+          [attr.aria-expanded]="profileMenuOpen"
+          aria-label="Abrir perfil de usuario">
+
+          <span class="profile-avatar">
+            {{ userInitials }}
+          </span>
+
+          <span class="profile-trigger-info">
+            <strong>{{ userName }}</strong>
+            <small>{{ primaryRole }}</small>
+          </span>
+
+          <span class="profile-chevron">
+            ⌄
+          </span>
+
+        </button>
+
+        <!-- MENU DE PERFIL -->
+        <div
+          class="profile-dropdown"
+          *ngIf="profileMenuOpen">
+
+          <div class="profile-dropdown-header">
+
+            <span class="profile-avatar profile-avatar-large">
+              {{ userInitials }}
+            </span>
+
+            <div class="profile-identity">
+              <strong>{{ userName }}</strong>
+              <span>{{ userEmail }}</span>
+            </div>
+
+          </div>
+
+          <div class="profile-dropdown-divider"></div>
+
+          <div class="profile-section">
+
+            <span class="profile-section-title">
+              TU ROL EN CAMPUSLAB
+            </span>
+
+            <div class="profile-role">
+
+              <span class="profile-role-icon">◇</span>
+
+              <div>
+                <strong>{{ primaryRole }}</strong>
+                <p>{{ roleDescription }}</p>
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="profile-section">
+
+            <span class="profile-section-title">
+              ROLES ASIGNADOS
+            </span>
+
+            <div
+              class="profile-role-list"
+              *ngIf="userRoles.length > 0">
+
+              <span
+                class="profile-role-badge"
+                *ngFor="let role of userRoles">
+                {{ role }}
+              </span>
+
+            </div>
+
+            <p
+              class="profile-empty-roles"
+              *ngIf="userRoles.length === 0">
+              No hay roles disponibles.
+            </p>
+
+          </div>
+
+          <div class="profile-dropdown-divider"></div>
+
+          <div class="profile-provider">
+
+            <span class="microsoft-symbol">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+
+            <div>
+              <strong>Cuenta Microsoft</strong>
+              <small>Sesión institucional</small>
+            </div>
+
+          </div>
+
+          <button
+            type="button"
+            class="profile-logout"
+            (click)="logout()">
+            ↪ Cerrar sesión
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
 
   </header>
 
-  <section class="content">
-    <router-outlet></router-outlet>
-  </section>
+  <!-- CERRAR PERFIL AL HACER CLIC FUERA -->
+  <button
+    *ngIf="profileMenuOpen"
+    type="button"
+    class="profile-backdrop"
+    aria-label="Cerrar perfil"
+    (click)="closeProfileMenu()">
+  </button>
+
+  <!-- ==========================================
+       DISTRIBUCION PRINCIPAL
+       ========================================== -->
+
+  <div
+    class="app-shell"
+    [class.shell-guest]="!initialized || !isLoggedIn()">
+
+    <!-- MENU LATERAL -->
+    <aside
+      class="sidebar"
+      *ngIf="initialized && isLoggedIn()"
+      [class.sidebar-open]="mobileMenuOpen">
+
+      <div class="sidebar-content">
+
+        <div class="sidebar-heading">
+          <span class="sidebar-heading-dot"></span>
+          ESPACIO DE TRABAJO
+        </div>
+
+        <!-- NAVEGACION -->
+        <nav class="nav" aria-label="Navegación principal">
+
+          <a
+            routerLink="/dashboard"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            (click)="closeMobileMenu(); closeProfileMenu()">
+
+            <span class="nav-icon">▦</span>
+            <span>Dashboard</span>
+          </a>
+
+          <!-- ESTUDIANTE -->
+          <a
+            *ngIf="
+              hasRole('ESTUDIANTE') &&
+              !hasAnyRole(['TECNICO', 'ADMIN'])
+            "
+            routerLink="/bookings"
+            routerLinkActive="active"
+            (click)="closeMobileMenu(); closeProfileMenu()">
+
+            <span class="nav-icon">▤</span>
+            <span>Mis reservas</span>
+          </a>
+
+          <!-- TECNICO Y ADMIN -->
+          <a
+            *ngIf="hasAnyRole(['TECNICO', 'ADMIN'])"
+            routerLink="/bookings"
+            routerLinkActive="active"
+            (click)="closeMobileMenu(); closeProfileMenu()">
+
+            <span class="nav-icon">▤</span>
+            <span>Gestión de reservas</span>
+          </a>
+
+          <div
+            class="sidebar-divider"
+            *ngIf="hasAnyRole(['ADMIN', 'AUDITOR'])">
+          </div>
+
+          <div
+            class="sidebar-heading"
+            *ngIf="hasRole('ADMIN')">
+            INFRAESTRUCTURA
+          </div>
+
+          <!-- RABBITMQ -->
+          <a
+            *ngIf="hasRole('ADMIN')"
+            routerLink="/rabbit-admin"
+            routerLinkActive="active"
+            (click)="closeMobileMenu(); closeProfileMenu()">
+
+            <span class="nav-icon">◎</span>
+            <span>RabbitMQ</span>
+          </a>
+
+          <!-- KAFKA -->
+          <a
+            *ngIf="hasRole('ADMIN')"
+            routerLink="/kafka-admin"
+            routerLinkActive="active"
+            (click)="closeMobileMenu(); closeProfileMenu()">
+
+            <span class="nav-icon">◈</span>
+            <span>Kafka</span>
+          </a>
+
+          <!-- AUDITORIA -->
+          <a
+            *ngIf="hasAnyRole(['AUDITOR', 'ADMIN'])"
+            routerLink="/audit"
+            routerLinkActive="active"
+            (click)="closeMobileMenu(); closeProfileMenu()">
+
+            <span class="nav-icon">◷</span>
+            <span>Auditoría</span>
+          </a>
+
+        </nav>
+
+      </div>
+
+      <!-- TARJETA INFERIOR -->
+      <div class="sidebar-footer">
+
+        <div class="sidebar-account">
+
+          <div class="sidebar-account-avatar">
+            {{ userInitials }}
+          </div>
+
+          <div class="sidebar-account-info">
+            <strong>{{ userName }}</strong>
+            <span>{{ primaryRole }}</span>
+          </div>
+
+        </div>
+
+        <div class="sidebar-status">
+          <span class="sidebar-status-dot"></span>
+          Autenticado con Microsoft
+        </div>
+
+      </div>
+
+    </aside>
+
+    <!-- CONTENIDO CENTRAL -->
+    <section class="content">
+
+      <router-outlet></router-outlet>
+
+    </section>
+
+  </div>
 
 </main>

@@ -1,150 +1,980 @@
+
+/* ==========================================
+   CAMPUSLAB - DISEÑO GLOBAL
+   ========================================== */
+
 :host {
   display: block;
   min-height: 100vh;
-  font-family: Arial, Helvetica, sans-serif;
-  color: #0f172a;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  color: #172b4d;
+
   background:
-    radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 30%),
-    linear-gradient(135deg, #f8fafc 0%, #eaf4ff 100%);
+    radial-gradient(
+      circle at top left,
+      rgba(37, 99, 235, 0.08),
+      transparent 35%
+    ),
+    linear-gradient(
+      135deg,
+      #f8fbff 0%,
+      #edf4fc 100%
+    );
 }
+
+/* ==========================================
+   ESTRUCTURA GENERAL
+   ========================================== */
 
 .layout {
   min-height: 100vh;
-  padding: 32px;
+  padding: 20px 24px 32px;
+  box-sizing: border-box;
 }
 
+/* ==========================================
+   BARRA SUPERIOR
+   ========================================== */
+
 .topbar {
-  max-width: 1180px;
-  margin: 0 auto 28px auto;
-  padding: 22px 26px;
-  border-radius: 24px;
-  background: white;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.10);
-  border: 1px solid #e2e8f0;
+  position: relative;
+  z-index: 100;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+
+  max-width: 1480px;
+  min-height: 78px;
+
+  margin: 0 auto 18px;
+  padding: 13px 20px;
+  box-sizing: border-box;
+
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid #e2eaf5;
+  border-radius: 20px;
+
+  box-shadow:
+    0 8px 28px rgba(31, 58, 95, 0.06);
 }
 
-.brand {
+.topbar-left,
+.topbar-actions {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
-.brand-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
-  display: grid;
-  place-items: center;
-  color: white;
-  font-weight: 900;
-  background: linear-gradient(135deg, #2563eb, #0284c7);
-  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.25);
+.topbar-left {
+  min-width: 0;
 }
 
-.topbar h1 {
-  margin: 0;
-  font-size: 30px;
-  letter-spacing: -0.04em;
-  color: #0f172a;
+.topbar-actions {
+  flex-shrink: 0;
 }
 
-.topbar p {
-  margin: 6px 0 0 0;
-  color: #64748b;
-  font-size: 15px;
-}
+/* ==========================================
+   LOGO CAMPUSLAB
+   ========================================== */
 
-.nav {
+.brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.nav a,
-.nav button {
-  border: none;
+  gap: 12px;
+  min-width: 0;
   text-decoration: none;
-  font-size: 14px;
+}
+
+.brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  width: 46px;
+  height: 46px;
+
+  color: #fff;
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #0ea5e9
+  );
+
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 900;
+
+  box-shadow:
+    0 7px 17px rgba(37, 99, 235, 0.18);
+}
+
+.brand-text h1 {
+  margin: 0;
+  color: #132e55;
+  font-size: 21px;
   font-weight: 800;
-  cursor: pointer;
-  border-radius: 999px;
-  padding: 12px 18px;
-  transition: all 0.2s ease;
+  letter-spacing: -0.7px;
 }
 
-.nav a {
-  color: #334155;
-  background: #f1f5f9;
+.brand-text p {
+  margin: 4px 0 0;
+  color: #8a9bb2;
+  font-size: 11px;
 }
 
-.nav a:hover {
-  color: #1d4ed8;
-  background: #dbeafe;
-}
+/* ==========================================
+   INDICADOR DE SESION
+   ========================================== */
 
-.nav a.active {
-  color: white;
-  background: linear-gradient(135deg, #2563eb, #0284c7);
-  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.25);
-}
-
-.nav button {
-  color: #991b1b;
-  background: #fee2e2;
-  box-shadow: 0 10px 20px rgba(248, 113, 113, 0.18);
-}
-
-.nav button:hover {
-  background: #fecaca;
-}
-
-.content {
-  max-width: 1180px;
-  margin: 0 auto;
-}
-
-.card {
-  background: white;
-  border-radius: 24px;
-  padding: 28px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.10);
-}
-
-@media (max-width: 760px) {
-  .layout {
-    padding: 16px;
-  }
-
-  .topbar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-/* Identificación del rol del usuario */
-
-.user-role {
+.session-indicator {
   display: inline-flex;
   align-items: center;
-  padding: 7px 12px;
-  border-radius: 20px;
-  background: #e0edff;
-  color: #1d4ed8;
+  gap: 7px;
+
+  padding: 8px 11px;
+
+  border: 1px solid #dcfce7;
+  border-radius: 999px;
+
+  background: #f0fdf4;
+  color: #15803d;
+
   font-size: 11px;
   font-weight: 700;
 }
 
-/* Permitir que el menú se acomode */
-.nav {
+.session-dot,
+.sidebar-status-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+
+  border-radius: 50%;
+  background: #22c55e;
+}
+
+/* ==========================================
+   DISTRIBUCION PRINCIPAL
+   ========================================== */
+
+.app-shell {
+  display: grid;
+
+  grid-template-columns:
+    250px minmax(0, 1fr);
+
+  gap: 20px;
+
+  /*
+   * IMPORTANTE:
+   * Stretch permite que la barra lateral
+   * crezca junto con el contenido del Dashboard.
+   */
+  align-items: stretch;
+
+  max-width: 1480px;
+  min-height: calc(100vh - 148px);
+
+  margin: 0 auto;
+}
+
+.app-shell.shell-guest {
+  display: block;
+}
+
+/* ==========================================
+   BARRA LATERAL
+   ========================================== */
+
+.sidebar {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  gap: 28px;
+
+  /*
+   * La barra ocupa toda la altura
+   * de su columna.
+   */
+  width: 100%;
+  height: 100%;
+
+  min-height: calc(100vh - 148px);
+
+  padding: 26px 15px 18px;
+  box-sizing: border-box;
+
+  background: rgba(255, 255, 255, 0.98);
+
+  border: 1px solid #e2eaf5;
+  border-radius: 19px;
+
+  box-shadow:
+    0 8px 28px rgba(31, 58, 95, 0.045);
+}
+
+/* ==========================================
+   CONTENIDO DE LA BARRA
+   ========================================== */
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.sidebar-heading {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  gap: 8px;
+
+  margin: 5px 10px 17px;
+
+  color: #91a1b7;
+
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.sidebar-heading-dot {
+  width: 7px;
+  height: 7px;
+
+  background: #3b82f6;
+  border-radius: 3px;
+}
+
+.sidebar-divider {
+  height: 1px;
+
+  margin: 22px 9px;
+
+  background: #edf1f7;
+}
+
+/* ==========================================
+   NAVEGACION LATERAL
+   ========================================== */
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+
+  width: 100%;
+}
+
+.nav a {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+
+  min-height: 49px;
+
+  padding: 13px 15px;
+
+  box-sizing: border-box;
+
+  border: 1px solid transparent;
+  border-radius: 12px;
+
+  text-decoration: none;
+
+  background: transparent;
+  color: #64748b;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.nav a:hover {
+  color: #2563eb;
+  background: #f0f6ff;
+  transform: translateX(2px);
+}
+
+.nav a.active {
+  color: #1d4ed8;
+
+  background: #eaf2ff;
+
+  border-color: #cfe0ff;
+
+  box-shadow:
+    inset 3px 0 0 #2563eb;
+}
+
+.nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 24px;
+  height: 24px;
+
+  flex-shrink: 0;
+
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* ==========================================
+   PERFIL INFERIOR DEL MENU
+   ========================================== */
+
+.sidebar-footer {
+  margin-top: auto;
+
+  padding: 18px 9px 8px;
+
+  border-top: 1px solid #edf1f7;
+}
+
+.sidebar-account {
+  display: flex;
+  align-items: center;
   gap: 10px;
+}
+
+.sidebar-account-avatar {
+  display: grid;
+  place-items: center;
+
+  width: 39px;
+  height: 39px;
+
+  flex-shrink: 0;
+
+  border-radius: 11px;
+
+  background: #eaf2ff;
+  color: #2563eb;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.sidebar-account-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  min-width: 0;
+}
+
+.sidebar-account-info strong {
+  color: #1e3a5f;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-account-info span {
+  color: #8b9bb0;
+  font-size: 10px;
+}
+
+.sidebar-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  margin-top: 15px;
+
+  color: #8495ab;
+  font-size: 10px;
+}
+
+/* ==========================================
+   CONTENIDO CENTRAL
+   ========================================== */
+
+.content {
+  min-width: 0;
+  width: 100%;
+  max-width: none;
+
+  /*
+   * Evita que el contenido se salga
+   * de la columna cuando hay tablas.
+   */
+  overflow-wrap: break-word;
+}
+
+/* ==========================================
+   PERFIL DEL ENCABEZADO
+   ========================================== */
+
+.profile-container {
+  position: relative;
+  z-index: 110;
+}
+
+.profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  max-width: 240px;
+
+  padding: 5px 10px 5px 5px;
+
+  background: #f8fbff;
+
+  border: 1px solid #e1e9f5;
+  border-radius: 13px;
+
+  cursor: pointer;
+
+  font-family: inherit;
+  text-align: left;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.profile-trigger:hover {
+  background: #edf4ff;
+  border-color: #bfd7fa;
+}
+
+.profile-avatar {
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  width: 39px;
+  height: 39px;
+
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #0ea5e9
+  );
+
+  color: white;
+  border-radius: 11px;
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.profile-trigger-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  min-width: 0;
+}
+
+.profile-trigger-info strong {
+  color: #173154;
+  font-size: 11px;
+  font-weight: 800;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-trigger-info small {
+  color: #8b9bb0;
+  font-size: 10px;
+}
+
+.profile-chevron {
+  color: #94a3b8;
+  margin-left: 4px;
+}
+
+/* ==========================================
+   MENU DESPLEGABLE DEL PERFIL
+   ========================================== */
+
+.profile-dropdown {
+  position: absolute;
+
+  top: calc(100% + 12px);
+  right: 0;
+
+  width: 340px;
+  max-width: calc(100vw - 30px);
+
+  padding: 16px;
+  box-sizing: border-box;
+
+  background: white;
+
+  border: 1px solid #dfe8f5;
+  border-radius: 17px;
+
+  box-shadow:
+    0 20px 55px rgba(20, 45, 80, 0.16);
+
+  animation: profile-enter 0.18s ease;
+}
+
+@keyframes profile-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 4px 2px 15px;
+}
+
+.profile-avatar-large {
+  width: 50px;
+  height: 50px;
+
+  border-radius: 14px;
+
+  font-size: 16px;
+}
+
+.profile-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  min-width: 0;
+}
+
+.profile-identity strong {
+  color: #173154;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  overflow-wrap: anywhere;
+}
+
+.profile-identity span {
+  color: #8493a9;
+  font-size: 11px;
+
+  overflow-wrap: anywhere;
+}
+
+.profile-dropdown-divider {
+  height: 1px;
+
+  margin: 3px 0 14px;
+
+  background: #e9eff7;
+}
+
+.profile-section {
+  padding: 0 2px 15px;
+}
+
+.profile-section-title {
+  display: block;
+  margin-bottom: 10px;
+
+  color: #91a0b4;
+
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+}
+
+.profile-role {
+  display: flex;
+  gap: 11px;
+
+  padding: 13px;
+
+  background: #f5f9ff;
+
+  border: 1px solid #e3edfb;
+  border-radius: 12px;
+}
+
+.profile-role-icon {
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 10px;
+
+  background: #e5efff;
+  color: #2563eb;
+
+  font-size: 20px;
+}
+
+.profile-role strong {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #173a68;
+  font-size: 12px;
+}
+
+.profile-role p {
+  margin: 0;
+
+  color: #7b8da6;
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.profile-role-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.profile-role-badge {
+  padding: 7px 10px;
+
+  border: 1px solid #cfe0ff;
+  border-radius: 8px;
+
+  background: #edf5ff;
+  color: #1d4ed8;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.profile-empty-roles {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+/* ==========================================
+   CUENTA MICROSOFT
+   ========================================== */
+
+.profile-provider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 3px 4px 16px;
+}
+
+.profile-provider > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-provider strong {
+  color: #334155;
+  font-size: 12px;
+}
+
+.profile-provider small {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.microsoft-symbol {
+  display: grid;
+
+  grid-template-columns: repeat(2, 9px);
+  grid-template-rows: repeat(2, 9px);
+
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.microsoft-symbol span:nth-child(1) {
+  background: #f25022;
+}
+
+.microsoft-symbol span:nth-child(2) {
+  background: #7fba00;
+}
+
+.microsoft-symbol span:nth-child(3) {
+  background: #00a4ef;
+}
+
+.microsoft-symbol span:nth-child(4) {
+  background: #ffb900;
+}
+
+/* ==========================================
+   CERRAR SESION
+   ========================================== */
+
+.profile-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  padding: 12px;
+
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+
+  background: #fff5f5;
+  color: #b91c1c;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.profile-logout:hover {
+  background: #fee2e2;
+}
+
+/* ==========================================
+   CERRAR PERFIL AL HACER CLIC FUERA
+   ========================================== */
+
+.profile-backdrop {
+  position: fixed;
+  inset: 0;
+
+  z-index: 90;
+
+  border: 0;
+  padding: 0;
+
+  background: transparent;
+  cursor: default;
+}
+
+/* ==========================================
+   BOTON MENU MOVIL
+   ========================================== */
+
+.mobile-menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
+  background: #f1f6ff;
+
+  border: 1px solid #dce6f4;
+  border-radius: 11px;
+
+  color: #2563eb;
+  font-size: 21px;
+
+  cursor: pointer;
+}
+
+/* ==========================================
+   TARJETAS GENERALES
+   ========================================== */
+
+.card {
+  padding: 26px;
+
+  background: white;
+
+  border: 1px solid #e2eaf4;
+  border-radius: 19px;
+
+  box-shadow:
+    0 8px 26px rgba(28, 56, 93, 0.05);
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 3px;
+}
+
+/* ==========================================
+   TABLETS Y PANTALLAS MEDIANAS
+   ========================================== */
+
+@media (max-width: 1000px) {
+
+  .app-shell {
+    grid-template-columns:
+      220px minmax(0, 1fr);
+
+    gap: 14px;
+  }
+
+  .sidebar {
+    padding-left: 11px;
+    padding-right: 11px;
+  }
+
+  .nav a {
+    padding: 12px 11px;
+    font-size: 12px;
+  }
+}
+
+/* ==========================================
+   CELULARES
+   ========================================== */
+
+@media (max-width: 760px) {
+
+  .layout {
+    padding: 12px;
+  }
+
+  .topbar {
+    min-height: 68px;
+
+    padding: 10px 12px;
+    margin-bottom: 12px;
+
+    border-radius: 15px;
+  }
+
+  .mobile-menu-toggle {
+    display: flex;
+  }
+
+  .app-shell {
+    display: flex;
+    flex-direction: column;
+
+    min-height: 0;
+    gap: 12px;
+  }
+
+  .sidebar {
+    display: none;
+    position: static;
+
+    width: 100%;
+    height: auto;
+    min-height: 0;
+
+    padding: 15px;
+
+    border-radius: 15px;
+  }
+
+  .sidebar.sidebar-open {
+    display: flex;
+  }
+
+  .sidebar-footer {
+    margin-top: 10px;
+  }
+
+  .content {
+    width: 100%;
+  }
+
+  .session-indicator {
+    display: none;
+  }
+}
+
+/* ==========================================
+   CELULARES PEQUEÑOS
+   ========================================== */
+
+@media (max-width: 520px) {
+
+  .brand-icon {
+    width: 40px;
+    height: 40px;
+
+    font-size: 14px;
+  }
+
+  .brand-text h1 {
+    font-size: 18px;
+  }
+
+  .brand-text p {
+    display: none;
+  }
+
+  .profile-trigger-info,
+  .profile-chevron {
+    display: none;
+  }
+
+  .profile-trigger {
+    padding: 4px;
+  }
+
+  .profile-avatar {
+    width: 37px;
+    height: 37px;
+  }
+
+  .profile-dropdown {
+    position: fixed;
+
+    top: 73px;
+    right: 12px;
+
+    width: calc(100vw - 24px);
+    max-width: 360px;
+  }
+
+  .card {
+    padding: 18px;
+  }
+}
+
+/* ==========================================
+   ACCESIBILIDAD
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .nav a,
+  .profile-trigger {
+    transition: none;
+  }
+
+  .profile-dropdown {
+    animation: none;
+  }
 }

@@ -1,54 +1,184 @@
 
 <section class="rabbit-page">
 
+  <!-- ENCABEZADO -->
   <header class="page-header">
+
     <div>
-      <span class="eyebrow">CAMPUSLAB · ADMINISTRACIÓN</span>
-      <h2>Administración RabbitMQ</h2>
+      <span class="eyebrow">
+        CAMPUSLAB / INFRAESTRUCTURA
+      </span>
+
+      <h2>RabbitMQ Admin</h2>
+
       <p>
-        Gestiona colas, exchanges y bindings desde CampusLab,
-        mediante API Gateway y el BFF protegido con JWT.
+        Consola de administración de mensajería,
+        colas, exchanges y bindings.
       </p>
     </div>
+
+    <span class="admin-role" *ngIf="isAdmin">
+      <span class="role-dot"></span>
+      Administrador
+    </span>
+
   </header>
 
-  <!-- VERIFICACIÓN DE PERMISOS -->
-  <div *ngIf="checkingRole" class="info-banner">
+  <!-- VERIFICACION DE PERMISOS -->
+  <div
+    *ngIf="checkingRole"
+    class="info-banner"
+    role="status">
+
     Verificando permisos de Microsoft Entra ID...
   </div>
 
-  <div *ngIf="error" class="error-message">
-    {{ error }}
+  <!-- MENSAJES -->
+  <div
+    *ngIf="error"
+    class="error-message"
+    role="alert">
+
+    <strong>Atención</strong>
+    <p>{{ error }}</p>
   </div>
 
-  <div *ngIf="success" class="success-message">
-    {{ success }}
+  <div
+    *ngIf="success"
+    class="success-message"
+    role="status">
+
+    <strong>Operación completada</strong>
+    <p>{{ success }}</p>
   </div>
 
-  <!-- PANEL EXCLUSIVO ADMIN -->
   <ng-container *ngIf="!checkingRole && isAdmin">
 
-    <div class="info-banner">
-      <strong>Panel de administrador</strong>
-      <p>
-        Estas operaciones modifican la configuración real
-        de RabbitMQ. Utiliza nombres de prueba y evita
-        eliminar componentes utilizados por CampusLab.
-      </p>
+    <!-- CONSOLA TECNICA -->
+    <section class="technical-console">
+
+      <div class="console-heading">
+
+        <div>
+          <span class="console-eyebrow">
+            CLOUD NATIVE / MESSAGE BROKER
+          </span>
+
+          <h3>Consola de mensajería</h3>
+
+          <p>
+            Operaciones administrativas conectadas
+            mediante API Gateway y BFF.
+          </p>
+        </div>
+
+        <div class="console-symbol" aria-hidden="true">
+          ◎
+        </div>
+
+      </div>
+
+      <div class="console-grid">
+
+        <div class="console-metric">
+          <span class="console-metric-label">
+            Identidad
+          </span>
+
+          <strong>Microsoft Entra ID</strong>
+
+          <small>Rol ADMIN reconocido</small>
+        </div>
+
+        <div class="console-metric">
+          <span class="console-metric-label">
+            Operaciones exitosas
+          </span>
+
+          <strong>{{ successfulOperations }}</strong>
+
+          <small>Desde que abriste esta pantalla</small>
+        </div>
+
+        <div class="console-metric">
+          <span class="console-metric-label">
+            Operaciones fallidas
+          </span>
+
+          <strong>{{ failedOperations }}</strong>
+
+          <small>Desde que abriste esta pantalla</small>
+        </div>
+
+      </div>
+
+      <div class="console-footnote">
+        <span class="console-dot"></span>
+
+        Los contadores muestran solicitudes efectuadas
+        en esta sesión de pantalla, no métricas
+        históricas del broker.
+      </div>
+
+    </section>
+
+    <!-- TITULO DE HERRAMIENTAS -->
+    <div class="section-heading">
+
+      <div>
+        <span class="section-kicker">
+          GESTIÓN DE RECURSOS
+        </span>
+
+        <h3>Herramientas administrativas</h3>
+
+        <p>
+          Crea y administra recursos de prueba
+          sin modificar componentes internos de CampusLab.
+        </p>
+      </div>
+
+      <span class="tools-tag">
+        3 MÓDULOS
+      </span>
+
     </div>
 
+    <!-- FORMULARIOS -->
     <div class="rabbit-grid">
 
-      <!-- COLAS -->
+      <!-- ====================================
+           COLAS
+           ==================================== -->
       <section class="admin-card">
+
         <div class="card-heading">
+
+          <div class="module-icon queue-icon">
+            ▤
+          </div>
+
           <span class="section-tag">01 · QUEUES</span>
-          <h3>Administración de colas</h3>
-          <p>Crea o elimina colas de mensajes.</p>
+
+          <h3>Colas</h3>
+
+          <p>
+            Crea colas y administra recursos
+            de mensajería.
+          </p>
+
+        </div>
+
+        <div class="form-section-title">
+          <span class="section-dot"></span>
+          Crear nueva cola
         </div>
 
         <form (ngSubmit)="createQueue()">
-          <label for="queueName">Nombre de la cola</label>
+
+          <label for="queueName">
+            Nombre de la cola
+          </label>
 
           <input
             id="queueName"
@@ -65,52 +195,103 @@
               name="queueDurable"
               [(ngModel)]="queueDurable"
             />
-            Cola durable
+
+            <span>Cola durable</span>
           </label>
 
           <button
+            type="submit"
             class="primary-button"
-            type="submit"
             [disabled]="loading || !queueName.trim()">
-            {{ loading ? 'Procesando...' : 'Crear cola' }}
+
+            {{
+              loading
+                ? 'Procesando...'
+                : '+ Crear cola'
+            }}
+
           </button>
+
         </form>
 
-        <div class="separator"></div>
+        <div class="danger-zone">
 
-        <h4>Eliminar cola</h4>
+          <div class="danger-title">
+            <span>!</span>
+            Zona de eliminación
+          </div>
 
-        <form (ngSubmit)="deleteQueue()">
-          <label for="deleteQueueName">Nombre de la cola</label>
+          <p>
+            Eliminar una cola puede provocar
+            la pérdida de sus mensajes.
+          </p>
 
-          <input
-            id="deleteQueueName"
-            name="deleteQueueName"
-            type="text"
-            [(ngModel)]="deleteQueueName"
-            placeholder="q.campuslab.prueba"
-            required
-          />
+          <form (ngSubmit)="deleteQueue()">
 
-          <button
-            class="danger-button"
-            type="submit"
-            [disabled]="loading || !deleteQueueName.trim()">
-            Eliminar cola
-          </button>
-        </form>
+            <label for="deleteQueueName">
+              Nombre de la cola
+            </label>
+
+            <input
+              id="deleteQueueName"
+              name="deleteQueueName"
+              type="text"
+              [(ngModel)]="deleteQueueName"
+              placeholder="q.campuslab.prueba"
+              required
+            />
+
+            <button
+              class="danger-button"
+              type="submit"
+              [disabled]="
+                loading ||
+                !deleteQueueName.trim()
+              ">
+
+              Eliminar cola
+            </button>
+
+          </form>
+
+        </div>
+
       </section>
 
-      <!-- EXCHANGES -->
+      <!-- ====================================
+           EXCHANGES
+           ==================================== -->
       <section class="admin-card">
+
         <div class="card-heading">
-          <span class="section-tag">02 · EXCHANGES</span>
-          <h3>Administración de exchanges</h3>
-          <p>Configura el enrutamiento de mensajes.</p>
+
+          <div class="module-icon exchange-icon">
+            ◈
+          </div>
+
+          <span class="section-tag">
+            02 · EXCHANGES
+          </span>
+
+          <h3>Exchanges</h3>
+
+          <p>
+            Configura las reglas de enrutamiento
+            de mensajes.
+          </p>
+
+        </div>
+
+        <div class="form-section-title">
+          <span class="section-dot"></span>
+          Crear nuevo exchange
         </div>
 
         <form (ngSubmit)="createExchange()">
-          <label for="exchangeName">Nombre del exchange</label>
+
+          <label for="exchangeName">
+            Nombre del exchange
+          </label>
 
           <input
             id="exchangeName"
@@ -121,64 +302,125 @@
             required
           />
 
-          <label for="exchangeType">Tipo de exchange</label>
+          <label for="exchangeType">
+            Tipo de exchange
+          </label>
 
           <select
             id="exchangeType"
             name="exchangeType"
             [(ngModel)]="exchangeType">
 
-            <option value="direct">Direct</option>
-            <option value="topic">Topic</option>
-            <option value="fanout">Fanout</option>
+            <option value="direct">
+              Direct
+            </option>
+
+            <option value="topic">
+              Topic
+            </option>
+
+            <option value="fanout">
+              Fanout
+            </option>
+
           </select>
 
           <button
             class="primary-button"
             type="submit"
-            [disabled]="loading || !exchangeName.trim()">
-            Crear exchange
+            [disabled]="
+              loading ||
+              !exchangeName.trim()
+            ">
+
+            {{
+              loading
+                ? 'Procesando...'
+                : '+ Crear exchange'
+            }}
+
           </button>
+
         </form>
 
-        <div class="separator"></div>
+        <div class="danger-zone">
 
-        <h4>Eliminar exchange</h4>
+          <div class="danger-title">
+            <span>!</span>
+            Zona de eliminación
+          </div>
 
-        <form (ngSubmit)="deleteExchange()">
-          <label for="deleteExchangeName">
-            Nombre del exchange
-          </label>
+          <p>
+            Al eliminar un exchange se pueden
+            perder sus bindings asociados.
+          </p>
 
-          <input
-            id="deleteExchangeName"
-            name="deleteExchangeName"
-            type="text"
-            [(ngModel)]="deleteExchangeName"
-            placeholder="campuslab.prueba.direct"
-            required
-          />
+          <form (ngSubmit)="deleteExchange()">
 
-          <button
-            class="danger-button"
-            type="submit"
-            [disabled]="loading || !deleteExchangeName.trim()">
-            Eliminar exchange
-          </button>
-        </form>
+            <label for="deleteExchangeName">
+              Nombre del exchange
+            </label>
+
+            <input
+              id="deleteExchangeName"
+              name="deleteExchangeName"
+              type="text"
+              [(ngModel)]="deleteExchangeName"
+              placeholder="campuslab.prueba.direct"
+              required
+            />
+
+            <button
+              class="danger-button"
+              type="submit"
+              [disabled]="
+                loading ||
+                !deleteExchangeName.trim()
+              ">
+
+              Eliminar exchange
+            </button>
+
+          </form>
+
+        </div>
+
       </section>
 
-      <!-- BINDINGS -->
+      <!-- ====================================
+           BINDINGS
+           ==================================== -->
       <section class="admin-card">
+
         <div class="card-heading">
-          <span class="section-tag">03 · BINDINGS</span>
-          <h3>Administración de bindings</h3>
-          <p>Relaciona exchanges y colas mediante routing keys.</p>
+
+          <div class="module-icon binding-icon">
+            ⑂
+          </div>
+
+          <span class="section-tag">
+            03 · BINDINGS
+          </span>
+
+          <h3>Bindings</h3>
+
+          <p>
+            Conecta exchanges y colas
+            usando routing keys.
+          </p>
+
+        </div>
+
+        <div class="form-section-title">
+          <span class="section-dot"></span>
+          Configurar binding
         </div>
 
         <form (ngSubmit)="createBinding()">
 
-          <label for="bindingQueueName">Nombre de la cola</label>
+          <label for="bindingQueueName">
+            Nombre de la cola
+          </label>
 
           <input
             id="bindingQueueName"
@@ -189,7 +431,9 @@
             required
           />
 
-          <label for="bindingExchangeName">Nombre del exchange</label>
+          <label for="bindingExchangeName">
+            Nombre del exchange
+          </label>
 
           <input
             id="bindingExchangeName"
@@ -200,7 +444,9 @@
             required
           />
 
-          <label for="bindingExchangeType">Tipo de exchange</label>
+          <label for="bindingExchangeType">
+            Tipo de exchange
+          </label>
 
           <select
             id="bindingExchangeType"
@@ -210,9 +456,12 @@
             <option value="direct">Direct</option>
             <option value="topic">Topic</option>
             <option value="fanout">Fanout</option>
+
           </select>
 
-          <label for="bindingRoutingKey">Routing key</label>
+          <label for="bindingRoutingKey">
+            Routing key
+          </label>
 
           <input
             id="bindingRoutingKey"
@@ -230,11 +479,12 @@
               !bindingQueueName.trim() ||
               !bindingExchangeName.trim()
             ">
+
             Crear binding
           </button>
 
           <button
-            class="danger-button"
+            class="danger-button binding-delete"
             type="button"
             (click)="deleteBinding()"
             [disabled]="
@@ -242,18 +492,104 @@
               !bindingQueueName.trim() ||
               !bindingExchangeName.trim()
             ">
+
             Eliminar binding
           </button>
 
         </form>
+
+        <p class="binding-help">
+          Para eliminar, utiliza los mismos datos
+          del binding y confirma la operación.
+        </p>
+
       </section>
 
     </div>
 
+    <!-- ====================================
+         ACTIVIDAD LOCAL
+         ==================================== -->
+    <section class="activity-card">
+
+      <div class="activity-header">
+
+        <div>
+          <span class="section-kicker">
+            ACTIVIDAD DE LA PANTALLA
+          </span>
+
+          <h3>Operaciones de esta sesión</h3>
+
+          <p>
+            Resultados de las operaciones ejecutadas
+            desde esta vista.
+          </p>
+        </div>
+
+        <span class="activity-counter">
+          {{ operations.length }} registro(s)
+        </span>
+
+      </div>
+
+      <div
+        *ngIf="operations.length === 0"
+        class="activity-empty">
+
+        Todavía no has realizado operaciones
+        administrativas en esta pantalla.
+      </div>
+
+      <div
+        class="activity-list"
+        *ngIf="operations.length > 0">
+
+        <div
+          class="activity-row"
+          *ngFor="let operation of operations">
+
+          <span
+            class="activity-symbol"
+            [class.activity-failed]="!operation.success">
+
+            {{ operation.success ? '✓' : '!' }}
+
+          </span>
+
+          <div class="activity-details">
+            <strong>{{ operation.message }}</strong>
+            <span>
+              {{ operation.date | date:'dd/MM/yyyy HH:mm:ss' }}
+            </span>
+          </div>
+
+          <span
+            class="activity-result"
+            [class.result-failed]="!operation.success">
+
+            {{ operation.success ? 'Éxito' : 'Error' }}
+
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- SEGURIDAD -->
     <div class="security-note">
-      <strong>Seguridad:</strong>
-      Todas las operaciones requieren un JWT válido
-      y autorización del rol ADMIN en el BFF.
+
+      <strong>Seguridad de infraestructura</strong>
+
+      <p>
+        Los recursos internos protegidos de CampusLab
+        no deben modificarse desde esta consola.
+        Las operaciones requieren autenticación JWT
+        y autorización ADMIN en el backend.
+      </p>
+
     </div>
 
   </ng-container>

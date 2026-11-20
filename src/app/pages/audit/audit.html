@@ -1,116 +1,495 @@
 
 <section class="audit-page">
 
-  <div class="page-header">
-    <span class="eyebrow">CAMPUSLAB · SEGURIDAD</span>
+  <!-- ======================================
+       ENCABEZADO
+       ====================================== -->
 
-    <h2>Auditoría del sistema</h2>
+  <header class="page-header">
 
-    <p>
-      Consulta y supervisa los eventos registrados
-      dentro de CampusLab.
-    </p>
-  </div>
+    <div>
+
+      <span class="eyebrow">
+        CAMPUSLAB / SEGURIDAD
+      </span>
+
+      <h2>Auditoría del sistema</h2>
+
+      <p>
+        Consulta la trazabilidad de los eventos
+        y operaciones de reservas académicas.
+      </p>
+
+    </div>
+
+    <span class="read-only-badge">
+      <span class="read-only-dot"></span>
+      Solo lectura
+    </span>
+
+  </header>
+
+  <!-- ======================================
+       INFORMACION
+       ====================================== -->
 
   <div class="information">
-    <strong>Registro de actividades</strong>
 
-    <p>
-      Este módulo muestra los eventos generados por
-      las reservas de CampusLab, procesados mediante
-      Apache Kafka y almacenados en el microservicio
-      de Auditoría.
-    </p>
+    <div class="information-icon">
+      ◈
+    </div>
+
+    <div>
+
+      <strong>Registro de eventos Cloud Native</strong>
+
+      <p>
+        Este módulo consulta los eventos de reservas
+        registrados en el microservicio de Auditoría,
+        dentro de la arquitectura de mensajería Kafka.
+      </p>
+
+    </div>
+
   </div>
 
-  <div class="audit-panel">
+  <!-- ======================================
+       ESTADISTICAS
+       ====================================== -->
+
+  <div class="stats-grid">
+
+    <article class="stat-card">
+
+      <span class="stat-icon stat-blue">
+        ▤
+      </span>
+
+      <span class="stat-label">
+        Eventos registrados
+      </span>
+
+      <strong class="stat-value">
+        {{ eventsLoaded ? totalEvents : '—' }}
+      </strong>
+
+      <p>Total de eventos recibidos</p>
+
+    </article>
+
+    <article class="stat-card">
+
+      <span class="stat-icon stat-green">
+        +
+      </span>
+
+      <span class="stat-label">
+        Reservas creadas
+      </span>
+
+      <strong class="stat-value">
+        {{ eventsLoaded ? createdEvents : '—' }}
+      </strong>
+
+      <p>Eventos BOOKING_CREATED</p>
+
+    </article>
+
+    <article class="stat-card">
+
+      <span class="stat-icon stat-purple">
+        ◷
+      </span>
+
+      <span class="stat-label">
+        Cambios de estado
+      </span>
+
+      <strong class="stat-value">
+        {{ eventsLoaded ? statusChangedEvents : '—' }}
+      </strong>
+
+      <p>Eventos BOOKING_STATUS_CHANGED</p>
+
+    </article>
+
+    <article class="stat-card">
+
+      <span class="stat-icon stat-orange">
+        ◈
+      </span>
+
+      <span class="stat-label">
+        Otros eventos
+      </span>
+
+      <strong class="stat-value">
+        {{ eventsLoaded ? otherEvents : '—' }}
+      </strong>
+
+      <p>Otros tipos registrados</p>
+
+    </article>
+
+  </div>
+
+  <!-- ======================================
+       PANEL DE EVENTOS
+       ====================================== -->
+
+  <section class="audit-panel">
 
     <div class="panel-header">
+
       <div>
+
+        <span class="section-kicker">
+          TRAZABILIDAD
+        </span>
+
         <h3>Historial de eventos</h3>
 
         <p>
-          Registro de creación y cambios de estado
-          de las reservas del sistema.
+          Busca y consulta los eventos registrados
+          por el sistema de reservas.
         </p>
+
       </div>
 
       <button
         type="button"
+        class="refresh-button"
         (click)="loadEvents()"
         [disabled]="loading">
-        {{ loading ? 'Actualizando...' : 'Actualizar' }}
+
+        <span aria-hidden="true">↻</span>
+
+        {{
+          loading
+            ? 'Actualizando...'
+            : 'Actualizar eventos'
+        }}
+
       </button>
+
     </div>
 
+    <!-- FILTROS -->
     <div class="filters">
-      <input
-        type="text"
-        [(ngModel)]="searchTerm"
-        placeholder="Buscar por evento, reserva o estado..."
-      />
+
+      <label class="search-field">
+
+        <span class="filter-label">
+          Buscar evento
+        </span>
+
+        <input
+          type="search"
+          name="searchTerm"
+          [(ngModel)]="searchTerm"
+          placeholder="ID, tipo, reserva o estado..."
+        />
+
+      </label>
+
+      <label class="select-field">
+
+        <span class="filter-label">
+          Tipo de evento
+        </span>
+
+        <select
+          name="selectedEventType"
+          [(ngModel)]="selectedEventType">
+
+          <option value="TODOS">
+            Todos los eventos
+          </option>
+
+          <option
+            *ngFor="let type of eventTypes"
+            [value]="type">
+
+            {{ formatEventType(type) }}
+
+          </option>
+
+        </select>
+
+      </label>
+
+      <label class="select-field">
+
+        <span class="filter-label">
+          Estado
+        </span>
+
+        <select
+          name="selectedStatus"
+          [(ngModel)]="selectedStatus">
+
+          <option value="TODOS">
+            Todos los estados
+          </option>
+
+          <option
+            *ngFor="let status of eventStatuses"
+            [value]="status">
+
+            {{ formatStatus(status) }}
+
+          </option>
+
+        </select>
+
+      </label>
+
+      <button
+        type="button"
+        class="clear-button"
+        (click)="clearFilters()"
+        [disabled]="!hasActiveFilters">
+
+        Limpiar
+      </button>
+
     </div>
 
-    <div class="table-container">
+    <!-- RESULTADOS -->
+    <div class="results-line">
 
-      <p *ngIf="loading" class="loading-state">
-        Cargando eventos de auditoría...
-      </p>
+      <span>
+        {{ filteredEvents.length }} evento(s) visibles
+      </span>
 
-      <p *ngIf="errorMessage" class="error-state">
-        {{ errorMessage }}
-      </p>
+      <span *ngIf="lastUpdated">
+        Consulta:
+        {{ lastUpdated | date:'dd/MM/yyyy HH:mm' }}
+      </span>
 
-      <table *ngIf="!loading && !errorMessage">
+    </div>
+
+    <!-- CARGANDO -->
+    <div
+      *ngIf="loading"
+      class="loading-state"
+      role="status">
+
+      <span class="loading-spinner"></span>
+
+      Cargando eventos de auditoría...
+
+    </div>
+
+    <!-- ERROR -->
+    <div
+      *ngIf="errorMessage"
+      class="error-state"
+      role="alert">
+
+      {{ errorMessage }}
+
+    </div>
+
+    <!-- TABLA -->
+    <div
+      class="table-container"
+      *ngIf="!loading && !errorMessage">
+
+      <table *ngIf="filteredEvents.length > 0">
 
         <thead>
+
           <tr>
             <th>Fecha del evento</th>
-            <th>Tipo de evento</th>
-            <th>ID de reserva</th>
+            <th>Evento</th>
+            <th>Reserva</th>
             <th>Estado</th>
-            <th>Fecha de recepción</th>
+            <th>Recepción</th>
+            <th>Detalle</th>
           </tr>
+
         </thead>
 
         <tbody>
 
-          <tr *ngFor="let event of filteredEvents">
+          <tr
+            *ngFor="
+              let event of filteredEvents;
+              trackBy: trackEvent
+            "
+            [class.selected-row]="selectedEvent === event">
 
             <td>
-              {{ event.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}
-            </td>
-
-            <td>
-              {{ event.eventType }}
-            </td>
-
-            <td>
-              {{ event.bookingId }}
-            </td>
-
-            <td>
-              {{ event.status }}
+              <span class="date-value">
+                {{ event.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}
+              </span>
             </td>
 
             <td>
-              {{ event.receivedAt | date:'dd/MM/yyyy HH:mm:ss' }}
+              <span
+                class="event-pill"
+                [ngClass]="getEventTypeClass(event.eventType)">
+
+                {{ formatEventType(event.eventType) }}
+
+              </span>
             </td>
 
-          </tr>
-
-          <tr *ngIf="filteredEvents.length === 0">
-            <td colspan="5" class="empty-state">
-              No se encontraron eventos de auditoría.
+            <td>
+              <strong class="booking-id">
+                #{{ event.bookingId }}
+              </strong>
             </td>
+
+            <td>
+              <span
+                class="status-pill"
+                [ngClass]="getStatusClass(event.status)">
+
+                <span class="status-dot"></span>
+
+                {{ formatStatus(event.status) }}
+
+              </span>
+            </td>
+
+            <td>
+              <span class="date-value">
+                {{ event.receivedAt | date:'dd/MM/yyyy HH:mm:ss' }}
+              </span>
+            </td>
+
+            <td>
+              <button
+                type="button"
+                class="details-button"
+                (click)="selectEvent(event)">
+
+                {{
+                  selectedEvent === event
+                    ? 'Cerrar'
+                    : 'Ver detalle'
+                }}
+
+              </button>
+            </td>
+
           </tr>
 
         </tbody>
 
       </table>
 
+      <div
+        *ngIf="filteredEvents.length === 0"
+        class="empty-state">
+
+        <span class="empty-icon">⌕</span>
+
+        <h3>No se encontraron eventos</h3>
+
+        <p *ngIf="hasActiveFilters">
+          Prueba con otra búsqueda o cambia los filtros.
+        </p>
+
+        <p *ngIf="!hasActiveFilters">
+          El servicio no devolvió eventos de auditoría.
+        </p>
+
+        <button
+          *ngIf="hasActiveFilters"
+          type="button"
+          class="clear-button"
+          (click)="clearFilters()">
+
+          Mostrar todos
+        </button>
+
+      </div>
+
     </div>
 
-  </div>
+  </section>
+
+  <!-- ======================================
+       DETALLE TECNICO DEL EVENTO
+       ====================================== -->
+
+  <section
+    class="event-details"
+    *ngIf="selectedEvent as event">
+
+    <div class="details-header">
+
+      <div>
+
+        <span class="details-eyebrow">
+          INSPECCIÓN / SOLO LECTURA
+        </span>
+
+        <h3>Detalle del evento</h3>
+
+        <p>
+          Información registrada por el servicio de Auditoría.
+        </p>
+
+      </div>
+
+      <button
+        type="button"
+        class="close-details"
+        aria-label="Cerrar detalle"
+        (click)="closeEventDetails()">
+
+        ✕
+      </button>
+
+    </div>
+
+    <div class="details-grid">
+
+      <div class="detail-field">
+        <span>ID del evento</span>
+        <strong>{{ event.eventId }}</strong>
+      </div>
+
+      <div class="detail-field">
+        <span>ID de reserva</span>
+        <strong>{{ event.bookingId }}</strong>
+      </div>
+
+      <div class="detail-field">
+        <span>Tipo de evento</span>
+        <strong>{{ event.eventType }}</strong>
+      </div>
+
+      <div class="detail-field">
+        <span>Estado registrado</span>
+        <strong>{{ event.status }}</strong>
+      </div>
+
+      <div class="detail-field">
+        <span>Fecha del evento</span>
+        <strong>
+          {{ event.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}
+        </strong>
+      </div>
+
+      <div class="detail-field">
+        <span>Fecha de recepción</span>
+        <strong>
+          {{ event.receivedAt | date:'dd/MM/yyyy HH:mm:ss' }}
+        </strong>
+      </div>
+
+    </div>
+
+    <p class="details-footnote">
+      Vista de consulta. No permite editar ni eliminar
+      los registros almacenados.
+    </p>
+
+  </section>
 
 </section>
