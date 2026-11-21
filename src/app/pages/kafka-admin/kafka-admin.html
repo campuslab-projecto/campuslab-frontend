@@ -1,8 +1,12 @@
 
 <section class="kafka-admin">
 
-  <!-- ENCABEZADO -->
+  <!-- ==========================================
+       ENCABEZADO
+       ========================================== -->
+
   <header class="kafka-header">
+
     <div>
       <span class="eyebrow">
         CAMPUSLAB / INFRAESTRUCTURA
@@ -11,7 +15,7 @@
       <h2>Kafka Admin</h2>
 
       <p>
-        Monitoreo de tópicos, particiones,
+        Administración de tópicos, particiones,
         consumidores y Dead Letter Topics.
       </p>
     </div>
@@ -20,29 +24,35 @@
       <span class="admin-dot"></span>
       Administrador
     </span>
+
   </header>
 
-  <!-- VERIFICACION -->
-  <div class="state-card" *ngIf="checkingRole">
+  <!-- ==========================================
+       VERIFICACION DE PERMISOS
+       ========================================== -->
+
+  <div
+    class="state-card"
+    *ngIf="checkingRole">
     Verificando permisos de administrador...
   </div>
 
-  <!-- ACCESO DENEGADO -->
   <div
-    *ngIf="!checkingRole && !isAdmin"
-    class="message-error">
+    class="message-error"
+    *ngIf="!checkingRole && !isAdmin">
     {{ error }}
   </div>
 
   <ng-container *ngIf="!checkingRole && isAdmin">
 
-    <!-- =====================================
+    <!-- ==========================================
          CONSOLA TECNICA
-         ===================================== -->
+         ========================================== -->
 
     <section class="technical-console">
 
       <div class="console-heading">
+
         <div>
           <span class="console-eyebrow">
             CLOUD NATIVE / EVENT STREAMING
@@ -51,14 +61,17 @@
           <h3>Consola de Apache Kafka</h3>
 
           <p>
-            Información técnica consultada desde
-            Kafka Admin mediante el BFF.
+            Información consultada desde Kafka Admin
+            mediante el BFF de CampusLab.
           </p>
         </div>
 
-        <div class="console-icon" aria-hidden="true">
+        <div
+          class="console-icon"
+          aria-hidden="true">
           ◎
         </div>
+
       </div>
 
       <div class="console-grid">
@@ -70,7 +83,7 @@
             {{ topicsLoaded ? topics.length : '—' }}
           </strong>
 
-          <small>Listado de tópicos recibido</small>
+          <small>Listado recibido del clúster</small>
         </div>
 
         <div class="console-metric">
@@ -84,7 +97,7 @@
             }}
           </strong>
 
-          <small>No implica consumidores conectados</small>
+          <small>Grupos de consumidores Kafka</small>
         </div>
 
         <div class="console-metric">
@@ -98,27 +111,25 @@
             }}
           </strong>
 
-          <small>Consulta de monitoreo DLT</small>
+          <small>Monitoreo de errores</small>
         </div>
 
       </div>
 
       <p class="console-note">
-        Los datos se actualizan al utilizar los botones
-        de consulta. No representan monitoreo
-        continuo en tiempo real.
+        Los datos se actualizan al ejecutar las consultas.
+        No representan monitoreo continuo.
       </p>
 
     </section>
 
-    <!-- =====================================
-         ESTADISTICAS
-         ===================================== -->
+    <!-- ==========================================
+         ESTADISTICAS DE TOPICOS
+         ========================================== -->
 
     <div class="stats-grid">
 
       <article class="stat-card">
-
         <div class="stat-icon">▦</div>
 
         <span class="stat-label">
@@ -135,7 +146,6 @@
       </article>
 
       <article class="stat-card">
-
         <div class="stat-icon">◈</div>
 
         <span class="stat-label">
@@ -152,7 +162,6 @@
       </article>
 
       <article class="stat-card">
-
         <div class="stat-icon dlt-icon">!</div>
 
         <span class="stat-label">
@@ -170,13 +179,14 @@
 
     </div>
 
-    <!-- =====================================
+    <!-- ==========================================
          EXPLORADOR DE TOPICOS
-         ===================================== -->
+         ========================================== -->
 
     <section class="dashboard-panel">
 
       <div class="panel-heading">
+
         <div>
           <span class="panel-kicker">
             EXPLORADOR DE RECURSOS
@@ -185,8 +195,8 @@
           <h3>Tópicos de Kafka</h3>
 
           <p>
-            Busca y consulta la configuración
-            de los tópicos del clúster.
+            Consulta los tópicos existentes,
+            sus particiones, réplicas y líderes.
           </p>
         </div>
 
@@ -194,25 +204,29 @@
           type="button"
           class="primary-btn"
           (click)="loadTopics()"
-          [disabled]="loading || loadingDetails">
+          [disabled]="loading">
 
           {{
             loading
               ? 'Consultando...'
               : '↻ Actualizar tópicos'
           }}
+
         </button>
+
       </div>
 
-      <!-- ERROR -->
-      <div *ngIf="error" class="message-error">
+      <div
+        *ngIf="error"
+        class="message-error">
         {{ error }}
       </div>
 
-      <!-- BUSCADOR -->
       <div class="search-box">
 
-        <span class="search-symbol" aria-hidden="true">
+        <span
+          class="search-symbol"
+          aria-hidden="true">
           ⌕
         </span>
 
@@ -223,9 +237,9 @@
           [value]="searchTerm"
           (input)="updateSearch($any($event.target).value)"
         />
+
       </div>
 
-      <!-- FILTROS -->
       <div class="filter-row">
 
         <div class="filter-buttons">
@@ -253,35 +267,41 @@
 
         </div>
 
-        <span class="results-count" *ngIf="topicsLoaded">
+        <span
+          class="results-count"
+          *ngIf="topicsLoaded">
           {{ filteredTopics.length }} resultados
         </span>
+
       </div>
 
-      <!-- ESTADO INICIAL -->
       <div
         class="empty-state"
         *ngIf="!topicsLoaded && !loading && !error">
 
         <span class="empty-icon">▦</span>
 
-        <strong>Explora los tópicos del clúster</strong>
+        <strong>
+          Explora los tópicos del clúster
+        </strong>
 
         <p>
-          Presiona Actualizar tópicos para consultar
-          la información desde el backend.
+          Presiona Actualizar tópicos
+          para consultar la información.
         </p>
+
       </div>
 
-      <!-- CARGANDO -->
-      <div class="empty-state" *ngIf="loading">
+      <div
+        class="empty-state"
+        *ngIf="loading">
 
         <span class="loading-spinner"></span>
 
-        <p>Consultando tópicos de Kafka...</p>
+        <p>Consultando tópicos Kafka...</p>
+
       </div>
 
-      <!-- SIN RESULTADOS -->
       <div
         class="empty-state"
         *ngIf="
@@ -290,16 +310,16 @@
           filteredTopics.length === 0
         ">
 
-        <span class="empty-icon">⌕</span>
-
-        <strong>No se encontraron tópicos</strong>
+        <strong>
+          No se encontraron tópicos
+        </strong>
 
         <p>
           Prueba otra búsqueda o cambia el filtro.
         </p>
+
       </div>
 
-      <!-- LISTADO -->
       <div
         class="topic-list"
         *ngIf="!loading && filteredTopics.length > 0">
@@ -315,7 +335,6 @@
           <div
             class="topic-icon"
             [class.topic-icon-dlt]="isDlt(topic)">
-
             {{ isDlt(topic) ? '!' : '▦' }}
           </div>
 
@@ -330,6 +349,7 @@
                   : 'Tópico de eventos'
               }}
             </span>
+
           </div>
 
           <span
@@ -337,6 +357,7 @@
             [class.topic-type-dlt]="isDlt(topic)">
 
             {{ isDlt(topic) ? 'DLT' : 'NORMAL' }}
+
           </span>
 
           <button
@@ -345,26 +366,38 @@
             (click)="loadTopicDetails(topic)"
             [disabled]="loadingDetails">
 
-            Ver detalle
-            <span aria-hidden="true">→</span>
+            Ver detalle →
+
+          </button>
+
+          <button
+            type="button"
+            class="detail-btn"
+            *ngIf="isDemoTopic(topic)"
+            (click)="selectManagedTopic(topic)"
+            [disabled]="managementBusy">
+
+            Administrar
+
           </button>
 
         </article>
+
       </div>
 
     </section>
 
-    <!-- =====================================
+    <!-- ==========================================
          DETALLE DEL TOPICO
-         ===================================== -->
+         ========================================== -->
 
     <section
       class="dashboard-panel detail-panel"
       *ngIf="selectedTopic">
 
       <div class="panel-heading">
-        <div>
 
+        <div>
           <span class="panel-kicker">
             INFORMACIÓN TÉCNICA
           </span>
@@ -374,7 +407,6 @@
           <p class="selected-topic-name">
             {{ selectedTopic }}
           </p>
-
         </div>
 
         <button
@@ -383,7 +415,9 @@
           (click)="closeTopicDetails()">
 
           Cerrar detalle
+
         </button>
+
       </div>
 
       <div
@@ -391,14 +425,13 @@
         *ngIf="loadingDetails">
 
         <span class="loading-spinner"></span>
-
         Consultando información del tópico...
+
       </div>
 
       <div
-        *ngIf="detailsError"
-        class="message-error">
-
+        class="message-error"
+        *ngIf="detailsError">
         {{ detailsError }}
       </div>
 
@@ -413,6 +446,7 @@
 
           <div class="detail-stat">
             <span>Tipo de tópico</span>
+
             <strong>
               {{
                 isDlt(details.name)
@@ -424,18 +458,23 @@
 
           <div class="detail-stat">
             <span>Particiones descritas</span>
-            <strong>{{ details.partitions.length }}</strong>
+
+            <strong>
+              {{ details.partitions.length }}
+            </strong>
           </div>
 
         </div>
 
         <div class="table-heading">
+
           <h4>Información de particiones</h4>
 
           <p>
             Líderes, réplicas e ISR
             de cada partición.
           </p>
+
         </div>
 
         <div class="table-wrapper">
@@ -457,7 +496,9 @@
                 *ngFor="let partition of details.partitions">
 
                 <td>
-                  <strong>#{{ partition.partition }}</strong>
+                  <strong>
+                    #{{ partition.partition }}
+                  </strong>
                 </td>
 
                 <td>
@@ -467,22 +508,36 @@
                 </td>
 
                 <td>
-                  {{ partition.replicas.join(', ') || '—' }}
+                  {{
+                    partition.replicas.join(', ') || '—'
+                  }}
                 </td>
 
                 <td>
-                  {{ partition.isr.join(', ') || '—' }}
+                  {{
+                    partition.isr.join(', ') || '—'
+                  }}
                 </td>
+
               </tr>
 
-              <tr *ngIf="details.partitions.length === 0">
-                <td colspan="4" class="no-partitions">
+              <tr
+                *ngIf="details.partitions.length === 0">
+
+                <td
+                  colspan="4"
+                  class="no-partitions">
+
                   No se encontraron particiones.
+
                 </td>
+
               </tr>
 
             </tbody>
+
           </table>
+
         </div>
 
         <p class="technical-note">
@@ -494,9 +549,669 @@
 
     </section>
 
-    <!-- =====================================
-         MONITOREO DLT
-         ===================================== -->
+    <!-- ==========================================
+         GESTION DE TOPICOS
+         ========================================== -->
+
+    <section class="dashboard-panel">
+
+      <div class="panel-heading">
+
+        <div>
+          <span class="panel-kicker">
+            ADMINISTRACIÓN / EP5
+          </span>
+
+          <h3>Gestión de tópicos</h3>
+
+          <p>
+            Crea, configura, aumenta particiones
+            y elimina tópicos de demostración.
+          </p>
+        </div>
+
+      </div>
+
+      <p class="technical-note">
+        Por seguridad, solo se pueden modificar
+        tópicos con el prefijo campuslab.demo.
+        Las operaciones se realizan mediante el BFF.
+      </p>
+
+      <!-- OPCIONES -->
+
+      <div class="filter-row">
+
+        <div class="filter-buttons">
+
+          <button
+            type="button"
+            [class.active]="managementMode === 'create'"
+            (click)="changeManagementMode('create')"
+            [disabled]="managementBusy">
+            Crear
+          </button>
+
+          <button
+            type="button"
+            [class.active]="managementMode === 'config'"
+            (click)="changeManagementMode('config')"
+            [disabled]="managementBusy">
+            Configuración
+          </button>
+
+          <button
+            type="button"
+            [class.active]="managementMode === 'partitions'"
+            (click)="changeManagementMode('partitions')"
+            [disabled]="managementBusy">
+            Particiones
+          </button>
+
+          <button
+            type="button"
+            [class.active]="managementMode === 'delete'"
+            (click)="changeManagementMode('delete')"
+            [disabled]="managementBusy">
+            Eliminar
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="producer-form">
+
+        <!-- NOMBRE DEL TOPICO -->
+
+        <div class="producer-field">
+
+          <label for="managementTopicName">
+            Nombre del tópico
+          </label>
+
+          <input
+            id="managementTopicName"
+            type="text"
+            placeholder="campuslab.demo.ep5.admin-test"
+            [value]="managementTopicName"
+            [disabled]="managementBusy"
+            (input)="changeManagementName($any($event.target).value)"
+          />
+
+          <small>
+            Debe comenzar con campuslab.demo.
+          </small>
+
+        </div>
+
+        <!-- ======================================
+             CONFIRMACION DETALLADA
+             ====================================== -->
+
+        <div
+          *ngIf="managementResult as result"
+          role="status"
+          aria-live="polite"
+          style="
+            padding: 22px;
+            margin: 16px 0;
+            border: 1px solid #cbd5e1;
+            border-radius: 14px;
+            background: #f8fafc;
+            color: #0f172a;
+          ">
+
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 12px;
+            ">
+
+            <span
+              style="
+                font-size: 26px;
+                font-weight: bold;
+              ">
+
+              {{ result.verified ? '✓' : 'ⓘ' }}
+
+            </span>
+
+            <div>
+
+              <h3
+                style="
+                  margin: 0;
+                  color: #0f172a;
+                ">
+
+                {{ result.title }}
+
+              </h3>
+
+              <p
+                style="
+                  margin: 5px 0 0;
+                  font-size: 13px;
+                ">
+
+                {{
+                  result.verified
+                    ? 'Resultado comprobado mediante una nueva consulta.'
+                    : 'La solicitud fue aceptada, pero falta comprobar el estado final.'
+                }}
+
+              </p>
+
+            </div>
+
+          </div>
+
+          <hr
+            style="
+              border: 0;
+              border-top: 1px solid #cbd5e1;
+              margin: 16px 0;
+            "
+          />
+
+          <p style="margin-bottom: 12px;">
+
+            <strong>Tópico:</strong>
+
+            {{ result.topic }}
+
+          </p>
+
+          <div
+            *ngFor="let detail of result.details"
+            style="
+              margin-top: 8px;
+              padding: 10px 12px;
+              background: white;
+              border: 1px solid #e2e8f0;
+              border-radius: 8px;
+              color: #334155;
+            ">
+
+            {{ detail }}
+
+          </div>
+
+        </div>
+
+        <!-- ERROR -->
+
+        <div
+          *ngIf="managementError"
+          class="message-error"
+          role="alert">
+
+          {{ managementError }}
+
+        </div>
+
+        <!-- PROCESANDO -->
+
+        <div
+          class="state-card"
+          *ngIf="managementBusy">
+
+          Procesando la operación y verificando
+          el resultado en Kafka...
+
+        </div>
+
+        <!-- ======================================
+             CREAR TOPICO
+             ====================================== -->
+
+        <ng-container *ngIf="managementMode === 'create'">
+
+          <div class="producer-input-grid">
+
+            <div class="producer-field">
+
+              <label for="createPartitions">
+                Cantidad de particiones (1 a 6)
+              </label>
+
+              <input
+                id="createPartitions"
+                type="number"
+                min="1"
+                max="6"
+                [value]="managementPartitions"
+                [disabled]="managementBusy"
+                (input)="changeManagementPartitions($any($event.target).value)"
+              />
+
+            </div>
+
+            <div class="producer-field">
+
+              <label for="replicationFactor">
+                Factor de replicación
+              </label>
+
+              <input
+                id="replicationFactor"
+                type="number"
+                [value]="managementReplicationFactor"
+                readonly
+              />
+
+              <small>
+                El backend de demostración permite
+                actualmente una réplica.
+              </small>
+
+            </div>
+
+          </div>
+
+          <button
+            type="button"
+            class="primary-btn"
+            [disabled]="!canCreateTopic"
+            (click)="createManagedTopic()">
+
+            {{
+              managementBusy
+                ? 'Creando y verificando...'
+                : '+ Crear tópico'
+            }}
+
+          </button>
+
+        </ng-container>
+
+        <!-- ======================================
+             CONFIGURACION
+             ====================================== -->
+
+        <ng-container *ngIf="managementMode === 'config'">
+
+          <button
+            type="button"
+            class="detail-btn"
+            [disabled]="!canManageTopic"
+            (click)="loadManagementConfig()">
+
+            {{
+              managementConfigLoading
+                ? 'Consultando...'
+                : 'Consultar configuración actual'
+            }}
+
+          </button>
+
+          <div
+            class="producer-preview"
+            *ngIf="managementCurrentConfig as config">
+
+            <h4>Configuración actual</h4>
+
+            <pre>{{ config | json }}</pre>
+
+            <p>
+              Valores recibidos desde Kafka.
+            </p>
+
+          </div>
+
+          <div class="producer-input-grid">
+
+            <div class="producer-field">
+
+              <label for="retentionDays">
+                Retención en días (1 a 30)
+              </label>
+
+              <input
+                id="retentionDays"
+                type="number"
+                min="1"
+                max="30"
+                [value]="managementRetentionDays"
+                [disabled]="managementBusy"
+                (input)="changeManagementRetention($any($event.target).value)"
+              />
+
+            </div>
+
+            <div class="producer-field">
+
+              <label for="cleanupPolicy">
+                Política de limpieza
+              </label>
+
+              <select
+                id="cleanupPolicy"
+                [value]="managementCleanupPolicy"
+                [disabled]="managementBusy"
+                (change)="changeManagementCleanup($any($event.target).value)">
+
+                <option value="delete">
+                  delete
+                </option>
+
+                <option value="compact">
+                  compact
+                </option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+          <button
+            type="button"
+            class="primary-btn"
+            [disabled]="!canUpdateConfig"
+            (click)="updateManagedConfig()">
+
+            {{
+              managementBusy
+                ? 'Guardando y verificando...'
+                : 'Guardar configuración'
+            }}
+
+          </button>
+
+        </ng-container>
+
+        <!-- ======================================
+             PARTICIONES
+             ====================================== -->
+
+        <ng-container *ngIf="managementMode === 'partitions'">
+
+          <button
+            type="button"
+            class="detail-btn"
+            [disabled]="!canManageTopic"
+            (click)="loadManagementPartitionCount()">
+
+            Consultar particiones actuales
+
+          </button>
+
+          <div
+            class="detail-stats"
+            *ngIf="managementCurrentPartitions !== null">
+
+            <div class="detail-stat">
+
+              <span>Particiones actuales</span>
+
+              <strong>
+                {{ managementCurrentPartitions }}
+              </strong>
+
+            </div>
+
+          </div>
+
+          <div class="producer-field">
+
+            <label for="newPartitions">
+              Nueva cantidad total de particiones
+            </label>
+
+            <input
+              id="newPartitions"
+              type="number"
+              min="1"
+              max="6"
+              [value]="managementPartitions"
+              [disabled]="managementBusy"
+              (input)="changeManagementPartitions($any($event.target).value)"
+            />
+
+          </div>
+
+          <p class="technical-note">
+            Kafka permite aumentar particiones,
+            pero no reducirlas. Máximo 6 particiones
+            para los tópicos de demostración.
+          </p>
+
+          <button
+            type="button"
+            class="primary-btn"
+            [disabled]="!canIncreasePartitions"
+            (click)="increaseManagedPartitions()">
+
+            {{
+              managementBusy
+                ? 'Actualizando y verificando...'
+                : 'Aumentar particiones'
+            }}
+
+          </button>
+
+        </ng-container>
+
+        <!-- ======================================
+             ELIMINACION
+             ====================================== -->
+
+        <ng-container *ngIf="managementMode === 'delete'">
+
+          <div class="message-error">
+
+            Atención: esta operación elimina el tópico
+            y sus mensajes. Utilízala únicamente
+            con tópicos de prueba.
+
+          </div>
+
+          <div class="producer-field">
+
+            <label for="deleteConfirmation">
+
+              Escribe exactamente el nombre del tópico
+              para confirmar la eliminación.
+
+            </label>
+
+            <input
+              id="deleteConfirmation"
+              type="text"
+              placeholder="Confirmar nombre completo"
+              [value]="managementConfirmation"
+              [disabled]="managementBusy"
+              (input)="changeManagementConfirmation($any($event.target).value)"
+            />
+
+          </div>
+
+          <button
+            type="button"
+            class="primary-btn"
+            [disabled]="!canDeleteTopic"
+            (click)="deleteManagedTopic()">
+
+            {{
+              managementBusy
+                ? 'Eliminando y verificando...'
+                : 'Eliminar tópico confirmado'
+            }}
+
+          </button>
+
+        </ng-container>
+
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         PREPARACION DE EVENTOS
+         ========================================== -->
+
+    <section class="dashboard-panel kafka-producer-panel">
+
+      <div class="panel-heading">
+
+        <div>
+          <span class="panel-kicker">
+            EVENT STREAMING / PRODUCER
+          </span>
+
+          <h3>Preparación de eventos Kafka</h3>
+
+          <p>
+            Visualiza la estructura de eventos
+            de reservas y ocupación.
+          </p>
+        </div>
+
+        <div
+          class="producer-symbol"
+          aria-hidden="true">
+          ◈
+        </div>
+
+      </div>
+
+      <div class="producer-form">
+
+        <div class="producer-field">
+
+          <label>Tipo de evento</label>
+
+          <div class="producer-options">
+
+            <label>
+              <input
+                type="radio"
+                name="eventType"
+                value="BOOKING_CREATED"
+                [checked]="eventType === 'BOOKING_CREATED'"
+                (change)="changeEventType('BOOKING_CREATED')"
+              />
+              Reserva creada
+            </label>
+
+            <label>
+              <input
+                type="radio"
+                name="eventType"
+                value="BOOKING_STATUS_CHANGED"
+                [checked]="eventType === 'BOOKING_STATUS_CHANGED'"
+                (change)="changeEventType('BOOKING_STATUS_CHANGED')"
+              />
+              Estado de reserva actualizado
+            </label>
+
+            <label>
+              <input
+                type="radio"
+                name="eventType"
+                value="OCCUPANCY_STARTED"
+                [checked]="eventType === 'OCCUPANCY_STARTED'"
+                (change)="changeEventType('OCCUPANCY_STARTED')"
+              />
+              Inicio de ocupación
+            </label>
+
+            <label>
+              <input
+                type="radio"
+                name="eventType"
+                value="OCCUPANCY_ENDED"
+                [checked]="eventType === 'OCCUPANCY_ENDED'"
+                (change)="changeEventType('OCCUPANCY_ENDED')"
+              />
+              Fin de ocupación
+            </label>
+
+          </div>
+
+        </div>
+
+        <div class="producer-input-grid">
+
+          <div class="producer-field">
+
+            <label for="eventBookingId">
+              ID de reserva
+            </label>
+
+            <input
+              id="eventBookingId"
+              type="text"
+              placeholder="Ej.: 101"
+              [value]="eventBookingId"
+              (input)="changeEventBookingId($any($event.target).value)"
+            />
+
+          </div>
+
+          <div class="producer-field">
+
+            <label for="eventResourceId">
+              Recurso
+            </label>
+
+            <input
+              id="eventResourceId"
+              type="text"
+              placeholder="Ej.: LAB-101"
+              [value]="eventResourceId"
+              (input)="changeEventResourceId($any($event.target).value)"
+            />
+
+          </div>
+
+        </div>
+
+        <div class="producer-topic">
+
+          <span>Tópico de destino</span>
+
+          <strong>{{ eventTopic }}</strong>
+
+        </div>
+
+        <button
+          type="button"
+          class="primary-btn producer-preview-btn"
+          [disabled]="!canPreviewEvent"
+          (click)="previewKafkaEvent()">
+
+          Vista previa del evento
+
+        </button>
+
+        <div
+          class="producer-preview"
+          *ngIf="showEventPreview">
+
+          <h4>Evento preparado</h4>
+
+          <pre>{{ eventPreviewJson }}</pre>
+
+          <p>
+            Esta función muestra únicamente
+            una vista previa.
+            No publica mensajes en Kafka.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         MONITOREO DE DEAD LETTER TOPICS
+         ========================================== -->
 
     <section class="dashboard-panel dlt-monitor-panel">
 
@@ -526,30 +1241,50 @@
               ? 'Consultando...'
               : '↻ Actualizar monitoreo'
           }}
+
         </button>
+
       </div>
 
-      <div *ngIf="dltError" class="message-error">
+      <div
+        class="message-error"
+        *ngIf="dltError">
+
         {{ dltError }}
+
       </div>
 
       <div
         class="empty-state"
-        *ngIf="!dltLoaded && !loadingDlt && !dltError">
+        *ngIf="
+          !dltLoaded &&
+          !loadingDlt &&
+          !dltError
+        ">
 
         <span class="empty-icon">!</span>
 
-        <strong>Monitoreo DLT disponible</strong>
+        <strong>
+          Monitoreo DLT disponible
+        </strong>
 
         <p>
-          Presiona Actualizar monitoreo para
-          consultar los offsets registrados.
+          Presiona Actualizar monitoreo
+          para consultar los offsets.
         </p>
+
       </div>
 
-      <div class="empty-state" *ngIf="loadingDlt">
+      <div
+        class="empty-state"
+        *ngIf="loadingDlt">
+
         <span class="loading-spinner"></span>
-        <p>Consultando offsets de tópicos DLT...</p>
+
+        <p>
+          Consultando offsets DLT...
+        </p>
+
       </div>
 
       <ng-container
@@ -582,12 +1317,10 @@
           class="empty-state"
           *ngIf="dlt.topics.length === 0">
 
-          <strong>No se encontraron tópicos DLT</strong>
+          <strong>
+            No se encontraron tópicos DLT
+          </strong>
 
-          <p>
-            Kafka no devolvió tópicos DLT
-            en esta consulta.
-          </p>
         </div>
 
         <div
@@ -607,19 +1340,24 @@
 
             <div class="topic-info">
 
-              <strong>{{ topic.name }}</strong>
+              <strong>
+                {{ topic.name }}
+              </strong>
 
               <span>
-                {{ topic.partitionCount }} partición(es)
-                · amplitud de offsets:
+                {{ topic.partitionCount }} particiones
+                · amplitud:
                 {{ topic.estimatedRecords | number }}
               </span>
+
             </div>
 
             <span class="topic-type topic-type-dlt">
               DLT
             </span>
+
           </article>
+
         </div>
 
         <ng-container
@@ -633,8 +1371,10 @@
             <h4>{{ topic.name }}</h4>
 
             <p>
-              Offsets iniciales y finales por partición.
+              Offsets iniciales y finales
+              por partición.
             </p>
+
           </div>
 
           <div class="table-wrapper">
@@ -665,47 +1405,63 @@
                   </td>
 
                   <td>
-                    {{ partition.beginningOffset | number }}
+                    {{
+                      partition.beginningOffset | number
+                    }}
                   </td>
 
                   <td>
-                    {{ partition.endOffset | number }}
+                    {{
+                      partition.endOffset | number
+                    }}
                   </td>
 
                   <td>
                     <strong>
-                      {{ partition.estimatedRecords | number }}
+                      {{
+                        partition.estimatedRecords | number
+                      }}
                     </strong>
                   </td>
+
                 </tr>
 
-                <tr *ngIf="topic.partitions.length === 0">
-                  <td colspan="4" class="no-partitions">
+                <tr
+                  *ngIf="topic.partitions.length === 0">
+
+                  <td
+                    colspan="4"
+                    class="no-partitions">
+
                     No se encontraron particiones.
+
                   </td>
+
                 </tr>
 
               </tbody>
+
             </table>
+
           </div>
 
         </ng-container>
 
         <p class="technical-note">
           La métrica offset-span corresponde a la
-          diferencia entre el offset final y el inicial
-          de cada partición. No es un conteo exacto de
-          mensajes, ni indica por sí sola cuántos
-          mensajes están pendientes de reprocesamiento.
+          diferencia entre el offset final y el inicial.
+          No representa necesariamente un conteo exacto
+          de mensajes ni la cantidad de mensajes
+          pendientes de reprocesamiento.
         </p>
 
       </ng-container>
 
     </section>
 
-    <!-- =====================================
-         CONSUMIDORES
-         ===================================== -->
+    <!-- ==========================================
+         GRUPOS DE CONSUMIDORES
+         ========================================== -->
 
     <section class="dashboard-panel consumer-panel">
 
@@ -719,8 +1475,8 @@
           <h3>Grupos de consumidores</h3>
 
           <p>
-            Consulta los grupos registrados en
-            el clúster de Apache Kafka.
+            Consulta los grupos registrados
+            en el clúster de Apache Kafka.
           </p>
         </div>
 
@@ -735,14 +1491,17 @@
               ? 'Consultando...'
               : '↻ Actualizar grupos'
           }}
+
         </button>
+
       </div>
 
       <div
-        *ngIf="groupsError"
-        class="message-error">
+        class="message-error"
+        *ngIf="groupsError">
 
         {{ groupsError }}
+
       </div>
 
       <div
@@ -755,19 +1514,27 @@
 
         <span class="empty-icon">◎</span>
 
-        <strong>Explora los consumidores</strong>
+        <strong>
+          Explora los consumidores
+        </strong>
 
         <p>
-          Presiona Actualizar grupos para consultar
-          la información de Kafka.
+          Presiona Actualizar grupos
+          para consultar la información.
         </p>
+
       </div>
 
-      <div class="empty-state" *ngIf="loadingGroups">
+      <div
+        class="empty-state"
+        *ngIf="loadingGroups">
 
         <span class="loading-spinner"></span>
 
-        <p>Consultando grupos de consumidores...</p>
+        <p>
+          Consultando grupos...
+        </p>
+
       </div>
 
       <div
@@ -778,11 +1545,10 @@
           consumerGroups.length === 0
         ">
 
-        <strong>No se encontraron grupos</strong>
+        <strong>
+          No se encontraron grupos
+        </strong>
 
-        <p>
-          Kafka no devolvió grupos de consumidores.
-        </p>
       </div>
 
       <div
@@ -795,13 +1561,18 @@
 
         <div class="consumer-stat">
           <span>Grupos registrados</span>
-          <strong>{{ consumerGroups.length }}</strong>
+
+          <strong>
+            {{ consumerGroups.length }}
+          </strong>
         </div>
 
         <div class="consumer-stat">
           <span>Origen de información</span>
+
           <strong>Apache Kafka</strong>
         </div>
+
       </div>
 
       <div
@@ -830,12 +1601,15 @@
             <p>
               {{ getConsumerGroupDescription(group) }}
             </p>
+
           </div>
 
           <span class="consumer-label">
             CONSUMIDOR
           </span>
+
         </article>
+
       </div>
 
       <p
@@ -843,8 +1617,9 @@
         *ngIf="groupsLoaded && !groupsError">
 
         Esta consulta muestra grupos registrados.
-        No confirma que sus consumidores estén
-        conectados actualmente.
+        No confirma que los consumidores
+        estén conectados actualmente.
+
       </p>
 
     </section>

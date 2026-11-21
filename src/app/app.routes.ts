@@ -51,6 +51,15 @@ export const routes: Routes = [
     canActivate: [MsalGuard, adminGuard]
   },
 
+  // REPORTERIA KAFKA - SOLO ADMINISTRADOR
+  {
+    path: 'reports',
+    loadComponent: () =>
+      import('./pages/reports/reports')
+        .then(m => m.Reports),
+    canActivate: [MsalGuard, adminGuard]
+  },
+
   // AUDITORÍA - AUDITOR Y ADMIN
   {
     path: 'audit',

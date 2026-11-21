@@ -1,0 +1,267 @@
+
+<section class="reports-page">
+
+  <!-- ENCABEZADO -->
+  <header class="page-header">
+
+    <div>
+      <span class="eyebrow">
+        CAMPUSLAB / ANALÍTICA
+      </span>
+
+      <h2>Reportería Kafka</h2>
+
+      <p>
+        Consulta los indicadores generados a partir
+        de los eventos procesados por ms-report.
+      </p>
+    </div>
+
+    <span class="read-only">
+      Solo lectura
+    </span>
+
+  </header>
+
+  <!-- CONSOLA TECNICA -->
+  <section class="report-console">
+
+    <div class="console-heading">
+
+      <div>
+        <span class="console-eyebrow">
+          CLOUD NATIVE / EVENT STREAMING
+        </span>
+
+        <h3>Procesamiento de eventos</h3>
+
+        <p>
+          Reportería consume eventos de reservas y
+          ocupación publicados en Apache Kafka.
+        </p>
+      </div>
+
+      <div class="console-icon">◈</div>
+
+    </div>
+
+    <div class="flow-grid">
+
+      <div class="flow-step">
+        <span>01</span>
+        <strong>ms-bookings</strong>
+        <small>Publica eventos</small>
+      </div>
+
+      <div class="flow-step">
+        <span>02</span>
+        <strong>Apache Kafka</strong>
+        <small>Distribuye eventos</small>
+      </div>
+
+      <div class="flow-step">
+        <span>03</span>
+        <strong>ms-report</strong>
+        <small>Consume y registra</small>
+      </div>
+
+    </div>
+
+    <p class="console-note">
+      Los indicadores se calculan con los registros
+      disponibles en ms-report. No son métricas
+      continuas en tiempo real.
+    </p>
+
+  </section>
+
+  <!-- BARRA DE ACCIONES -->
+  <div class="section-heading">
+
+    <div>
+      <span class="section-kicker">
+        INDICADORES
+      </span>
+
+      <h3>Resumen de eventos procesados</h3>
+
+      <p *ngIf="lastUpdated">
+        Última consulta:
+        {{ lastUpdated | date:'dd/MM/yyyy HH:mm:ss' }}
+      </p>
+    </div>
+
+    <button
+      class="refresh-btn"
+      type="button"
+      (click)="loadReports()"
+      [disabled]="loading">
+
+      {{ loading ? 'Consultando...' : '↻ Actualizar indicadores' }}
+
+    </button>
+
+  </div>
+
+  <!-- ERROR -->
+  <div
+    class="error-state"
+    role="alert"
+    *ngIf="error">
+
+    {{ error }}
+
+  </div>
+
+  <!-- CARGA -->
+  <div
+    *ngIf="loading"
+    class="loading-state"
+    role="status">
+
+    Consultando indicadores de ms-report...
+
+  </div>
+
+  <!-- METRICAS -->
+  <div class="stats-grid">
+
+    <article class="stat-card">
+      <span class="stat-icon">▦</span>
+      <span class="stat-label">Eventos procesados</span>
+      <strong class="stat-value">
+        {{ loaded && kpis ? (kpis.totalEventos | number) : '—' }}
+      </strong>
+      <span class="stat-description">
+        Registros disponibles en Reportería
+      </span>
+    </article>
+
+    <article class="stat-card">
+      <span class="stat-icon">◈</span>
+      <span class="stat-label">Reservas distintas</span>
+      <strong class="stat-value">
+        {{ loaded && kpis ? (kpis.reservasDistintas | number) : '—' }}
+      </strong>
+      <span class="stat-description">
+        Identificadores de reserva únicos
+      </span>
+    </article>
+
+    <article class="stat-card">
+      <span class="stat-icon">↗</span>
+      <span class="stat-label">Eventos de reservas</span>
+      <strong class="stat-value">
+        {{ loaded && kpis ? (kpis.eventosReservas | number) : '—' }}
+      </strong>
+      <span class="stat-description">
+        Eventos del tópico de reservas
+      </span>
+    </article>
+
+    <article class="stat-card">
+      <span class="stat-icon">◎</span>
+      <span class="stat-label">Eventos de ocupación</span>
+      <strong class="stat-value">
+        {{ loaded && kpis ? (kpis.eventosOcupacion | number) : '—' }}
+      </strong>
+      <span class="stat-description">
+        Eventos del tópico de ocupación
+      </span>
+    </article>
+
+    <article class="stat-card">
+      <span class="stat-icon">▤</span>
+      <span class="stat-label">Recursos distintos</span>
+      <strong class="stat-value">
+        {{ loaded && kpis ? (kpis.recursosDistintos | number) : '—' }}
+      </strong>
+      <span class="stat-description">
+        Recursos identificados en los eventos
+      </span>
+    </article>
+
+  </div>
+
+  <!-- RECURSOS -->
+  <section class="report-panel">
+
+    <div class="panel-heading">
+
+      <div>
+        <span class="section-kicker">
+          ANÁLISIS DE USO
+        </span>
+
+        <h3>Recursos más utilizados</h3>
+
+        <p>
+          Resultados de los últimos siete días,
+          calculados por el microservicio de Reportes.
+        </p>
+      </div>
+
+    </div>
+
+    <div
+      *ngIf="loaded && topResources.length === 0"
+      class="empty-state">
+
+      No hay recursos con registros de uso
+      durante los últimos siete días.
+
+    </div>
+
+    <div
+      class="table-wrapper"
+      *ngIf="loaded && topResources.length > 0">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Recurso</th>
+            <th>Total de reservas</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr
+            *ngFor="
+              let resource of topResources;
+              trackBy: trackResource
+            ">
+
+            <td>
+              <strong>{{ resource.resourceId }}</strong>
+            </td>
+
+            <td>
+              <span class="value-pill">
+                {{ resource.totalReservas | number }}
+              </span>
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+  <div class="info-note">
+    <strong>Información técnica</strong>
+
+    <p>
+      Esta pantalla muestra datos reales consultados
+      desde el BFF. Los indicadores reflejan registros
+      persistidos por ms-report y no reemplazan una
+      inspección directa de Kafka o de sus consumer groups.
+    </p>
+  </div>
+
+</section>
