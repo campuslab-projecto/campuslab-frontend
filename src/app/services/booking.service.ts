@@ -1,5 +1,6 @@
 
 import { Injectable } from '@angular/core';
+import { protectedResources } from '../auth-config';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Booking } from '../models/booking';
@@ -10,7 +11,7 @@ import { Booking } from '../models/booking';
 export class BookingService {
 
   private readonly apiUrl =
-    'https://ok83lxm1s3.execute-api.us-east-1.amazonaws.com/api/bookings';
+    `${protectedResources.api.endpoint}bookings`;
 
   constructor(private http: HttpClient) {}
 

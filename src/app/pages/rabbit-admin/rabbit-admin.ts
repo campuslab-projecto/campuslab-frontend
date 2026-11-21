@@ -17,7 +17,7 @@ import { MsalService } from '@azure/msal-angular';
 import { protectedResources } from '../../auth-config';
 
 const API_URL =
-  'https://ok83lxm1s3.execute-api.us-east-1.amazonaws.com/api/rabbit';
+  `${protectedResources.api.endpoint}rabbit`;
 
 type ExchangeType = 'direct' | 'topic' | 'fanout';
 
