@@ -12,21 +12,12 @@ import {
 const currentOrigin = window.location.origin;
 
 // ==========================================
-// SELECCION AUTOMATICA DEL ENTORNO
+// CONFIGURACION DE AWS
 // ==========================================
 
-// Si CampusLab se ejecuta localmente,
-// utilizamos el BFF de IntelliJ.
-//
-// Si está desplegado en AWS Amplify,
-// utilizamos API Gateway.
-
-const isLocalEnvironment =
-  window.location.hostname === 'localhost' ||
-  window.location.hostname === '127.0.0.1';
-
-const LOCAL_API_URL =
-  'http://localhost:8080/api/';
+// API Gateway de AWS.
+// Todas las solicitudes del frontend se
+// enviaran a AWS en lugar de localhost.
 
 const PRODUCTION_API_URL =
   'https://ok83lxm1s3.execute-api.us-east-1.amazonaws.com/api/';
